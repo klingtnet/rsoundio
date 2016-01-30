@@ -8,6 +8,15 @@ impl SoundIo {
         SoundIo { context: unsafe { ffi::soundio_create() } }
     }
 
+    pub fn channel_layout_builtin_count() -> i32 {
+        let cnt = unsafe { ffi::soundio_channel_layout_builtin_count() };
+        if cnt < 0 {
+            panic!("Negative # of builtin channel layouts!")
+        } else {
+            cnt as i32
+        }
+    }
+
     pub fn connect(&self) -> Option<ffi::Enum_SoundIoError> {
         match unsafe { ffi::soundio_connect(self.context) } {
             ffi::Enum_SoundIoError::SoundIoErrorNone => None,
@@ -88,6 +97,7 @@ fn test_soundio() {
         assert!(sio.connect_backend(ffi::Enum_SoundIoBackend::SoundIoBackendAlsa).is_none());
         sio.disconnect();
     }
+    assert!(SoundIo::channel_layout_builtin_count() >= 0);
 }
 
 #[test]
