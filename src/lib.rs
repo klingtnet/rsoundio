@@ -205,6 +205,67 @@ impl Display for ChannelLayout {
     }
 }
 
+#[derive(Debug)]
+pub struct Device {
+    device: *mut ffi::Struct_SoundIoDevice,
+}
+impl Device {
+    pub fn new(dev_ptr: *mut ffi::Struct_SoundIoDevice) -> Self {
+        Device { device: dev_ptr }
+    }
+
+    // ref is a keyword
+    fn inc_ref(&self) {
+        unsafe { ffi::soundio_device_ref(self.device) }
+    }
+
+    fn dec_ref(&self) {
+        unsafe { ffi::soundio_device_unref(self.device) }
+    }
+
+    pub fn sort_channel_layouts(&self) {
+        unsafe { ffi::soundio_device_sort_channel_layouts(self.device) }
+    }
+
+    pub fn supports_format(&self, format: ffi::Enum_SoundIoFormat) -> bool {
+        unsafe { ffi::soundio_device_supports_format(self.device, format) == 1u8 }
+    }
+
+    pub fn supports_layout(&self, layout: &ChannelLayout) -> bool {
+        unsafe { ffi::soundio_device_supports_layout(self.device, layout.layout) == 1u8 }
+    }
+
+    pub fn supports_sample_rate(&self, sample_rate: i32) -> bool {
+        unsafe {
+            ffi::soundio_device_supports_sample_rate(self.device, sample_rate as c_int) == 1u8
+        }
+    }
+
+    pub fn nearest_sample_rate(&self, sample_rate: i32) -> i32 {
+        unsafe { ffi::soundio_device_nearest_sample_rate(self.device, sample_rate) as i32 }
+    }
+}
+impl Display for Device {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        let str_ptr = unsafe { (*self.device).name };
+        write!(f, "{}", ffi::ptr_to_string(str_ptr).unwrap())
+    }
+}
+impl Drop for Device {
+    fn drop(&mut self) {
+        self.dec_ref()
+    }
+}
+impl PartialEq for Device {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { ffi::soundio_device_equal(self.device, other.device) == 1u8 }
+    }
+
+    fn ne(&self, other: &Self) -> bool {
+        !self.eq(other)
+    }
+}
+
 #[test]
 fn test_soundio() {
     let sio = SoundIo::new();
@@ -262,4 +323,29 @@ fn test_enums() {
                ffi::Enum_SoundIoFormat::SoundIoFormatU8.get_bytes_per_sample());
     assert_eq!(4,
                ffi::Enum_SoundIoFormat::SoundIoFormatU32LE.get_bytes_per_sample());
+}
+
+#[test]
+fn test_device() {
+    let sio = SoundIo::new();
+    assert!(sio.connect().is_none());
+    sio.flush_events();
+    let in_dev_idx = sio.default_input_device_index().unwrap();
+    let out_dev_idx = sio.default_output_device_index().unwrap();
+    let in_dev = sio.get_input_device(in_dev_idx).unwrap();
+    let out_dev = sio.get_output_device(out_dev_idx).unwrap();
+    println!("{}", in_dev);
+    println!("{}", out_dev);
+    assert!(in_dev != out_dev);
+    assert_eq!(in_dev, in_dev);
+    out_dev.sort_channel_layouts();
+    let stereo_layout = ChannelLayout::get_default(2).unwrap();
+    assert!(in_dev.supports_format(ffi::Enum_SoundIoFormat::SoundIoFormatFloat32LE));
+    assert!(out_dev.supports_format(ffi::Enum_SoundIoFormat::SoundIoFormatFloat32LE));
+    assert!(in_dev.supports_layout(&stereo_layout));
+    assert!(out_dev.supports_layout(&stereo_layout));
+    assert!(in_dev.supports_sample_rate(48_000));
+    assert!(out_dev.supports_sample_rate(48_000));
+    assert!(in_dev.nearest_sample_rate(1) > 0);
+    assert!(out_dev.nearest_sample_rate(1) > 0);
 }
