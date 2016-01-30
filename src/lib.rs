@@ -89,3 +89,11 @@ fn test_soundio() {
         sio.disconnect();
     }
 }
+
+#[test]
+fn test_enums() {
+    assert_eq!("(no error)",
+               format!("{}", ffi::Enum_SoundIoError::SoundIoErrorNone));
+    assert_eq!("ALSA",
+               format!("{}", ffi::Enum_SoundIoBackend::SoundIoBackendAlsa));
+}
