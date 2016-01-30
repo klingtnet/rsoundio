@@ -1,6 +1,7 @@
 mod ffi;
 
 use std::os::raw::c_int;
+use std::fmt::Display;
 
 pub struct SoundIo {
     context: *mut ffi::Struct_SoundIo,
@@ -87,6 +88,91 @@ impl Drop for SoundIo {
     }
 }
 
+#[derive(Debug)]
+struct ChannelLayout {
+    layout: *const ffi::Struct_SoundIoChannelLayout,
+}
+impl ChannelLayout {
+    fn new(raw_layout: *const ffi::Struct_SoundIoChannelLayout) -> Self {
+        ChannelLayout { layout: raw_layout }
+    }
+
+    pub fn get_builtin(idx: i32) -> Option<Self> {
+        if 0 <= idx && idx < SoundIo::channel_layout_builtin_count() {
+            Some(ChannelLayout::new(unsafe {
+                ffi::soundio_channel_layout_get_builtin(idx as c_int)
+            }))
+        } else {
+            None
+        }
+    }
+
+    pub fn get_default(channel_count: i32) -> Option<Self> {
+        if channel_count < 0 {
+            None
+        } else {
+            Some(ChannelLayout::new(unsafe {
+                ffi::soundio_channel_layout_get_default(channel_count as i32)
+            }))
+        }
+    }
+
+
+    pub fn find_channel(&self, channel: ffi::Enum_SoundIoChannelId) -> Option<i32> {
+        match unsafe { ffi::soundio_channel_layout_find_channel(self.layout, channel) } {
+            -1 => None,
+            idx @ _ => Some(idx),
+        }
+    }
+
+    pub fn detect_builtin(&mut self) -> bool {
+        // This is a hack because of the transmute.
+        unsafe {
+            let mut_layout: *mut ffi::Struct_SoundIoChannelLayout =
+                ::std::mem::transmute(self.layout);
+            ffi::soundio_channel_layout_detect_builtin(mut_layout) == 1
+        }
+    }
+
+    pub fn best_matching_channel_layout(preferred_layouts: &[ChannelLayout],
+                                        available_layouts: &[ChannelLayout])
+                                        -> Option<ChannelLayout> {
+        // do some magic with the slices
+        let raw_preferred_layouts: Vec<_> = preferred_layouts.iter()
+                                                             .map(|l| unsafe { (*l.layout) })
+                                                             .collect();
+        let raw_available_layouts: Vec<_> = available_layouts.iter()
+                                                             .map(|l| unsafe { (*l.layout) })
+                                                             .collect();
+        let layout_ptr = unsafe {
+            ffi::soundio_best_matching_channel_layout(raw_preferred_layouts.as_ptr(),
+                                                      preferred_layouts.len() as c_int,
+                                                      raw_available_layouts.as_ptr(),
+                                                      available_layouts.len() as c_int)
+        };
+        if layout_ptr.is_null() {
+            None
+        } else {
+            Some(ChannelLayout::new(layout_ptr))
+        }
+    }
+}
+impl PartialEq for ChannelLayout {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { ffi::soundio_channel_layout_equal(self.layout, other.layout) == 1u8 }
+    }
+
+    fn ne(&self, other: &Self) -> bool {
+        !self.eq(other)
+    }
+}
+impl Display for ChannelLayout {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        let str_ptr = unsafe { (*self.layout).name };
+        write!(f, "{}", ffi::ptr_to_string(str_ptr).unwrap())
+    }
+}
+
 #[test]
 fn test_soundio() {
     let sio = SoundIo::new();
@@ -100,6 +186,26 @@ fn test_soundio() {
         sio.disconnect();
     }
     assert!(SoundIo::channel_layout_builtin_count() >= 0);
+}
+
+#[test]
+fn test_channel_layout() {
+    let cnt = SoundIo::channel_layout_builtin_count();
+    assert!(cnt > 0);
+    assert!(ChannelLayout::get_builtin(-1).is_none());
+    assert_eq!(ChannelLayout::get_builtin(0), ChannelLayout::get_builtin(0));
+    let mut layout = ChannelLayout::get_default(2).unwrap();
+    assert!(layout.detect_builtin());
+    assert!(layout.find_channel(ffi::Enum_SoundIoChannelId::SoundIoChannelIdFrontLeft).is_some());
+    assert!(layout.find_channel(ffi::Enum_SoundIoChannelId::SoundIoChannelIdLfe2).is_none());
+    assert!(cnt > 2);
+    let preferred = [ChannelLayout::get_builtin(0).unwrap(),
+                     ChannelLayout::get_builtin(1).unwrap()];
+    let available = [ChannelLayout::get_builtin(1).unwrap(),
+                     ChannelLayout::get_builtin(2).unwrap()];
+    let best_match = ChannelLayout::best_matching_channel_layout(&preferred, &available);
+    assert_eq!(ChannelLayout::get_builtin(1).unwrap(), best_match.unwrap());
+
 }
 
 #[test]
