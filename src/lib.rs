@@ -97,6 +97,24 @@ impl SoundIo {
         }
     }
 
+    pub fn get_input_device(&self, idx: i32) -> Option<Device> {
+        let dev_ptr = unsafe { ffi::soundio_get_input_device(self.context, idx) };
+        if dev_ptr.is_null() {
+            None
+        } else {
+            Some(Device::new(dev_ptr))
+        }
+    }
+
+    pub fn get_output_device(&self, idx: i32) -> Option<Device> {
+        let dev_ptr = unsafe { ffi::soundio_get_output_device(self.context, idx) };
+        if dev_ptr.is_null() {
+            None
+        } else {
+            Some(Device::new(dev_ptr))
+        }
+    }
+
     pub fn default_input_device_index(&self) -> Option<i32> {
         match unsafe { ffi::soundio_default_input_device_index(self.context) } {
             -1 => None,
