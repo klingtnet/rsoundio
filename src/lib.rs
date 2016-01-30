@@ -78,6 +78,24 @@ impl SoundIo {
     pub fn disconnect(&self) {
         unsafe { ffi::soundio_disconnect(self.context) }
     }
+
+    pub fn input_device_count(&self) -> Option<i32> {
+        let cnt = unsafe { ffi::soundio_input_device_count(self.context) };
+        if cnt < 0 {
+            None
+        } else {
+            Some(cnt as i32)
+        }
+    }
+
+    pub fn output_device_count(&self) -> Option<i32> {
+        let cnt = unsafe { ffi::soundio_output_device_count(self.context) };
+        if cnt < 0 {
+            None
+        } else {
+            Some(cnt as i32)
+        }
+    }
 }
 impl Drop for SoundIo {
     fn drop(&mut self) {
@@ -186,6 +204,10 @@ fn test_soundio() {
         sio.disconnect();
     }
     assert!(SoundIo::channel_layout_builtin_count() >= 0);
+    assert!(sio.connect().is_none());
+    sio.flush_events();
+    assert!(sio.output_device_count().unwrap() > 0);
+    assert!(sio.input_device_count().unwrap() > 0);
 }
 
 #[test]
