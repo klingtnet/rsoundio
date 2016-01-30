@@ -152,6 +152,13 @@ pub enum Enum_SoundIoBackend {
     SoundIoBackendWasapi = 5,
     SoundIoBackendDummy = 6,
 }
+impl Display for Enum_SoundIoBackend {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        let str_ptr = unsafe { soundio_backend_name(*self) };
+        write!(f, "{}", ptr_to_string(str_ptr).unwrap())
+    }
+}
+
 #[derive(Clone, Copy)]
 #[repr(u32)]
 pub enum Enum_SoundIoDeviceAim {
