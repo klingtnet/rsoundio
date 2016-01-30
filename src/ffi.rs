@@ -6,7 +6,7 @@ use std::ffi::CStr;
 use std::ffi::CString;
 use std::fmt::Display;
 
-fn ptr_to_string(str_ptr: *const c_char) -> Result<String, Utf8Error> {
+pub fn ptr_to_string(str_ptr: *const c_char) -> Result<String, Utf8Error> {
     let str_slice: &str = try!(unsafe { CStr::from_ptr(str_ptr) }.to_str());
     Ok(str_slice.to_string())
 }
