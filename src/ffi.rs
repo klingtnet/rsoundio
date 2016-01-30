@@ -442,6 +442,10 @@ extern "C" {
                                                 available_layout_count:
                                                     c_int)
      -> *const Struct_SoundIoChannelLayout;
+    // TODO: I am not sure if I should implement the sort method. The benefit does not
+    // justify the amount of work to get it done. `ChannelLayout` contains only
+    // `*const Struct_SoundIoChannelLayout` pointer, so `transmute` must be used to
+    // make the `*mut` pointer.
     pub fn soundio_sort_channel_layouts(layouts: *mut Struct_SoundIoChannelLayout,
                                         layout_count: c_int);
     pub fn soundio_get_bytes_per_sample(format: Enum_SoundIoFormat) -> c_int;
