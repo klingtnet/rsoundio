@@ -38,7 +38,7 @@ impl Display for Enum_SoundIoError {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 #[repr(u32)]
 pub enum Enum_SoundIoChannelId {
     SoundIoChannelIdInvalid = 0,
@@ -115,6 +115,13 @@ impl Display for Enum_SoundIoChannelId {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         let str_ptr = unsafe { soundio_get_channel_name(*self) };
         write!(f, "{}", ptr_to_string(str_ptr).unwrap())
+    }
+}
+impl From<String> for Enum_SoundIoChannelId {
+    fn from(id: String) -> Self {
+        let str_len = id.len() as i32;
+        let cstr = CString::new(id).unwrap();
+        unsafe { soundio_parse_channel_id(cstr.as_ptr(), str_len) }
     }
 }
 

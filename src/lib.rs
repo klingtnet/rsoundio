@@ -98,4 +98,8 @@ fn test_enums() {
                format!("{}", ffi::Enum_SoundIoBackend::SoundIoBackendAlsa));
     assert_eq!("Front Left",
                format!("{}", ffi::Enum_SoundIoChannelId::SoundIoChannelIdFrontLeft));
+    assert_eq!(ffi::Enum_SoundIoChannelId::from("Front Left".to_string()),
+               ffi::Enum_SoundIoChannelId::SoundIoChannelIdFrontLeft);
+    assert!(ffi::Enum_SoundIoChannelId::from("SomeInvalidBoredom".to_string()) !=
+            ffi::Enum_SoundIoChannelId::SoundIoChannelIdFrontLeft);
 }
