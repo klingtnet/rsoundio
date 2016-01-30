@@ -96,4 +96,6 @@ fn test_enums() {
                format!("{}", ffi::Enum_SoundIoError::SoundIoErrorNone));
     assert_eq!("ALSA",
                format!("{}", ffi::Enum_SoundIoBackend::SoundIoBackendAlsa));
+    assert_eq!("Front Left",
+               format!("{}", ffi::Enum_SoundIoChannelId::SoundIoChannelIdFrontLeft));
 }
