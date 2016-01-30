@@ -210,7 +210,7 @@ impl Display for Enum_SoundIoFormat {
 }
 impl Enum_SoundIoFormat {
     pub fn get_bytes_per_sample(self) -> i32 {
-        unsafe {soundio_get_bytes_per_sample(self) as i32 }
+        unsafe { soundio_get_bytes_per_sample(self) as i32 }
     }
 }
 
