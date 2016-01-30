@@ -208,6 +208,11 @@ impl Display for Enum_SoundIoFormat {
         write!(f, "{}", ptr_to_string(str_ptr).unwrap())
     }
 }
+impl Enum_SoundIoFormat {
+    pub fn get_bytes_per_sample(self) -> i32 {
+        unsafe {soundio_get_bytes_per_sample(self) as i32 }
+    }
+}
 
 #[repr(C)]
 #[derive(Copy)]
