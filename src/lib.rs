@@ -220,4 +220,5 @@ fn test_enums() {
                ffi::Enum_SoundIoChannelId::SoundIoChannelIdFrontLeft);
     assert!(ffi::Enum_SoundIoChannelId::from("SomeInvalidBoredom".to_string()) !=
             ffi::Enum_SoundIoChannelId::SoundIoChannelIdFrontLeft);
+    assert_eq!("unsigned 8-bit", format!("{}", ffi::Enum_SoundIoFormat::SoundIoFormatU8));
 }

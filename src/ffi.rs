@@ -202,6 +202,13 @@ pub enum Enum_SoundIoFormat {
     SoundIoFormatFloat64LE = 17,
     SoundIoFormatFloat64BE = 18,
 }
+impl Display for Enum_SoundIoFormat {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        let str_ptr = unsafe { soundio_format_string(*self) };
+        write!(f, "{}", ptr_to_string(str_ptr).unwrap())
+    }
+}
+
 #[repr(C)]
 #[derive(Copy)]
 pub struct Struct_SoundIoChannelLayout {
