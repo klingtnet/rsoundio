@@ -1,5 +1,7 @@
 mod ffi;
 
+use std::os::raw::c_int;
+
 pub struct SoundIo {
     context: *mut ffi::Struct_SoundIo,
 }
@@ -37,7 +39,7 @@ impl SoundIo {
     }
 
     pub fn backend_count(&self) -> i32 {
-        let cnt: i32 = unsafe { ffi::soundio_backend_count(self.context) };
+        let cnt = unsafe { ffi::soundio_backend_count(self.context) } as i32;
         if cnt < 0 {
             panic!("Negative backend count!");
         } else {
