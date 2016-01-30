@@ -121,7 +121,7 @@ impl Drop for SoundIo {
 }
 
 #[derive(Debug)]
-struct ChannelLayout {
+pub struct ChannelLayout {
     layout: *const ffi::Struct_SoundIoChannelLayout,
 }
 impl ChannelLayout {
