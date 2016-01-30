@@ -96,6 +96,20 @@ impl SoundIo {
             Some(cnt as i32)
         }
     }
+
+    pub fn default_input_device_index(&self) -> Option<i32> {
+        match unsafe { ffi::soundio_default_input_device_index(self.context) } {
+            -1 => None,
+            idx @ _ => Some(idx as i32),
+        }
+    }
+
+    pub fn default_output_device_index(&self) -> Option<i32> {
+        match unsafe { ffi::soundio_default_output_device_index(self.context) } {
+            -1 => None,
+            idx @ _ => Some(idx as i32),
+        }
+    }
 }
 impl Drop for SoundIo {
     fn drop(&mut self) {
