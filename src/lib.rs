@@ -76,3 +76,16 @@ impl Drop for SoundIo {
     }
 }
 
+#[test]
+fn test_soundio() {
+    let sio = SoundIo::new();
+    assert!(sio.backend_count() > 0);
+    assert!(sio.get_backend(0).is_some());
+    assert!(sio.get_backend(-1).is_none());
+    assert!(sio.connect().is_none());
+    sio.disconnect();
+    if sio.have_backend(ffi::Enum_SoundIoBackend::SoundIoBackendAlsa) {
+        assert!(sio.connect_backend(ffi::Enum_SoundIoBackend::SoundIoBackendAlsa).is_none());
+        sio.disconnect();
+    }
+}
