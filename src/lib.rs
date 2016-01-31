@@ -278,6 +278,10 @@ impl Device {
             Some(OutStream::new(stream_ptr))
         }
     }
+
+    pub fn ref_count(&self) -> i32 {
+        unsafe { (*self.device).ref_count as i32 }
+    }
 }
 impl Display for Device {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
