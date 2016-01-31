@@ -56,7 +56,7 @@ impl SoundIo {
     }
 
     pub fn current_backend(&self) -> Option<ffi::Enum_SoundIoBackend> {
-         match unsafe { (*self.context).current_backend } {
+        match unsafe { (*self.context).current_backend } {
             ffi::Enum_SoundIoBackend::SoundIoBackendNone => None,
             backend @ _ => Some(backend),
         }
