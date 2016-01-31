@@ -239,6 +239,7 @@ impl ::std::default::Default for Struct_SoundIoChannelLayout {
         unsafe { ::std::mem::zeroed() }
     }
 }
+
 #[repr(C)]
 #[derive(Copy)]
 pub struct Struct_SoundIoSampleRateRange {
@@ -271,6 +272,7 @@ impl ::std::default::Default for Struct_SoundIoChannelArea {
         unsafe { ::std::mem::zeroed() }
     }
 }
+
 #[repr(C)]
 #[derive(Copy)]
 pub struct Struct_SoundIo {
@@ -301,6 +303,7 @@ impl ::std::default::Default for Struct_SoundIo {
         unsafe { ::std::mem::zeroed() }
     }
 }
+
 #[repr(C)]
 #[derive(Copy)]
 pub struct Struct_SoundIoDevice {
@@ -334,6 +337,7 @@ impl ::std::default::Default for Struct_SoundIoDevice {
         unsafe { ::std::mem::zeroed() }
     }
 }
+
 #[repr(C)]
 #[derive(Copy)]
 pub struct Struct_SoundIoOutStream {
