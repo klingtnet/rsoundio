@@ -11,6 +11,7 @@ pub fn ptr_to_string(str_ptr: *const c_char) -> Result<String, Utf8Error> {
     Ok(str_slice.to_string())
 }
 
+#[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(u32)]
 pub enum Enum_SoundIoError {
@@ -38,6 +39,7 @@ impl Display for Enum_SoundIoError {
     }
 }
 
+#[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy, PartialEq, Debug)]
 #[repr(u32)]
 pub enum Enum_SoundIoChannelId {
@@ -125,6 +127,7 @@ impl From<String> for Enum_SoundIoChannelId {
     }
 }
 
+#[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy)]
 #[repr(u32)]
 pub enum Enum_SoundIoChannelLayoutId {
@@ -155,6 +158,8 @@ pub enum Enum_SoundIoChannelLayoutId {
     SoundIoChannelLayoutId7Point1WideBack = 24,
     SoundIoChannelLayoutIdOctagonal = 25,
 }
+
+#[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy)]
 #[repr(u32)]
 pub enum Enum_SoundIoBackend {
@@ -173,12 +178,15 @@ impl Display for Enum_SoundIoBackend {
     }
 }
 
+#[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy)]
 #[repr(u32)]
 pub enum Enum_SoundIoDeviceAim {
     SoundIoDeviceAimInput = 0,
     SoundIoDeviceAimOutput = 1,
 }
+
+#[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy)]
 #[repr(u32)]
 pub enum Enum_SoundIoFormat {
@@ -400,6 +408,8 @@ impl ::std::default::Default for Struct_SoundIoInStream {
         unsafe { ::std::mem::zeroed() }
     }
 }
+
+#[allow(dead_code,non_camel_case_types)]
 pub enum Struct_SoundIoRingBuffer { }
 
 #[link(name = "soundio")]
