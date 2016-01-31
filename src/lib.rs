@@ -389,10 +389,16 @@ impl OutStream {
         dev.inc_ref();
         dev
     }
+
+    pub fn destroy(&mut self) {
+        unsafe { ffi::soundio_outstream_destroy(self.stream) }
+    }
 }
 impl Drop for OutStream {
     fn drop(&mut self) {
-        unsafe { ffi::soundio_outstream_destroy(self.stream) }
+        // TODO: call destroy manually.
+        // OutStream will get dropped each time a new
+        // struct is created from the same *mut pointer.
     }
 }
 
