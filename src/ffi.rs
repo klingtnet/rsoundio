@@ -491,18 +491,21 @@ extern "C" {
     pub fn soundio_outstream_create(device: *mut Struct_SoundIoDevice)
                                     -> *mut Struct_SoundIoOutStream;
     pub fn soundio_outstream_destroy(outstream: *mut Struct_SoundIoOutStream);
-    pub fn soundio_outstream_open(outstream: *mut Struct_SoundIoOutStream) -> c_int;
-    pub fn soundio_outstream_start(outstream: *mut Struct_SoundIoOutStream) -> c_int;
+    pub fn soundio_outstream_open(outstream: *mut Struct_SoundIoOutStream) -> Enum_SoundIoError;
+    pub fn soundio_outstream_start(outstream: *mut Struct_SoundIoOutStream) -> Enum_SoundIoError;
     pub fn soundio_outstream_begin_write(outstream: *mut Struct_SoundIoOutStream,
                                          areas: *mut *mut Struct_SoundIoChannelArea,
                                          frame_count: *mut c_int)
-                                         -> c_int;
-    pub fn soundio_outstream_end_write(outstream: *mut Struct_SoundIoOutStream) -> c_int;
-    pub fn soundio_outstream_clear_buffer(outstream: *mut Struct_SoundIoOutStream) -> c_int;
-    pub fn soundio_outstream_pause(outstream: *mut Struct_SoundIoOutStream, pause: u8) -> c_int;
+                                         -> Enum_SoundIoError;
+    pub fn soundio_outstream_end_write(outstream: *mut Struct_SoundIoOutStream) -> Enum_SoundIoError;
+    pub fn soundio_outstream_clear_buffer(outstream: *mut Struct_SoundIoOutStream)
+                                          -> Enum_SoundIoError;
+    pub fn soundio_outstream_pause(outstream: *mut Struct_SoundIoOutStream,
+                                   pause: u8)
+                                   -> Enum_SoundIoError;
     pub fn soundio_outstream_get_latency(outstream: *mut Struct_SoundIoOutStream,
                                          out_latency: *mut ::std::os::raw::c_double)
-                                         -> c_int;
+                                         -> Enum_SoundIoError;
     pub fn soundio_instream_create(device: *mut Struct_SoundIoDevice) -> *mut Struct_SoundIoInStream;
     pub fn soundio_instream_destroy(instream: *mut Struct_SoundIoInStream);
     pub fn soundio_instream_open(instream: *mut Struct_SoundIoInStream) -> c_int;

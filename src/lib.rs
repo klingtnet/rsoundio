@@ -1,6 +1,6 @@
 mod ffi;
 
-use std::os::raw::c_int;
+use std::os::raw::{c_int, c_double};
 use std::fmt::Display;
 
 pub struct SoundIo {
@@ -262,6 +262,15 @@ impl Device {
     pub fn nearest_sample_rate(&self, sample_rate: i32) -> i32 {
         unsafe { ffi::soundio_device_nearest_sample_rate(self.device, sample_rate) as i32 }
     }
+
+    pub fn create_outstream(&self) -> Option<OutStream> {
+        let stream_ptr = unsafe { ffi::soundio_outstream_create(self.device) };
+        if stream_ptr.is_null() {
+            None
+        } else {
+            Some(OutStream::new(stream_ptr))
+        }
+    }
 }
 impl Display for Device {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
@@ -281,6 +290,75 @@ impl PartialEq for Device {
 
     fn ne(&self, other: &Self) -> bool {
         !self.eq(other)
+    }
+}
+
+pub struct OutStream {
+    stream: *mut ffi::Struct_SoundIoOutStream,
+}
+impl OutStream {
+    pub fn new(raw_stream: *mut ffi::Struct_SoundIoOutStream) -> Self {
+        OutStream { stream: raw_stream }
+    }
+
+    pub fn open(&self) -> Option<ffi::Enum_SoundIoError> {
+        match unsafe { ffi::soundio_outstream_open(self.stream) } {
+            ffi::Enum_SoundIoError::SoundIoErrorNone => None,
+            err @ _ => Some(err),
+        }
+    }
+
+    pub fn start(&self) -> Option<ffi::Enum_SoundIoError> {
+        match unsafe { ffi::soundio_outstream_start(self.stream) } {
+            ffi::Enum_SoundIoError::SoundIoErrorNone => None,
+            err @ _ => Some(err),
+        }
+    }
+
+    pub fn begin_write(&self) -> Option<ffi::Enum_SoundIoError> {
+        // TODO
+        None
+    }
+
+    pub fn end_write(&self) -> Option<ffi::Enum_SoundIoError> {
+        match unsafe { ffi::soundio_outstream_end_write(self.stream) } {
+            ffi::Enum_SoundIoError::SoundIoErrorNone => None,
+            err @ _ => Some(err),
+        }
+    }
+
+    pub fn clear_buffer(&self) -> Option<ffi::Enum_SoundIoError> {
+        match unsafe { ffi::soundio_outstream_clear_buffer(self.stream) } {
+            ffi::Enum_SoundIoError::SoundIoErrorNone => None,
+            err @ _ => Some(err),
+        }
+    }
+
+    pub fn pause(&self, pause: bool) -> Option<ffi::Enum_SoundIoError> {
+        let pause_c_bool = match pause {
+            true => 1u8,
+            false => 0u8,
+        };
+        match unsafe { ffi::soundio_outstream_pause(self.stream, pause_c_bool) } {
+            ffi::Enum_SoundIoError::SoundIoErrorNone => None,
+            err @ _ => Some(err),
+        }
+    }
+
+    pub fn get_latency(&self) -> Result<f64, ffi::Enum_SoundIoError> {
+        let mut latency = 0.0f64;
+        match unsafe {
+            ffi::soundio_outstream_get_latency(self.stream, &mut latency as *mut c_double)
+        } {
+            ffi::Enum_SoundIoError::SoundIoErrorNone => Ok(latency),
+            err @ _ => Err(err),
+        }
+
+    }
+}
+impl Drop for OutStream {
+    fn drop(&mut self) {
+        unsafe { ffi::soundio_outstream_destroy(self.stream) }
     }
 }
 
@@ -366,4 +444,19 @@ fn test_device() {
     assert!(out_dev.supports_sample_rate(48_000));
     assert!(in_dev.nearest_sample_rate(1) > 0);
     assert!(out_dev.nearest_sample_rate(1) > 0);
+}
+
+#[test]
+fn test_outstream() {
+    let sio = SoundIo::new();
+    assert!(sio.connect().is_none());
+    sio.flush_events();
+    let dev_idx = sio.default_output_device_index().unwrap();
+    let dev = sio.get_output_device(dev_idx).unwrap();
+    let stream = dev.create_outstream().unwrap();
+    assert!(stream.open().is_none());
+    assert!(stream.clear_buffer().is_none());
+    assert!(stream.pause(true).is_none());
+    assert!(stream.pause(false).is_none());
+    println!("latency: {}", stream.get_latency().unwrap());
 }
