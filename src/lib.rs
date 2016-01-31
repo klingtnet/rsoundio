@@ -366,6 +366,29 @@ impl OutStream {
         }
 
     }
+
+    pub fn current_format(&self) -> Result<ffi::Enum_SoundIoFormat, ffi::Enum_SoundIoError> {
+        match unsafe { (*self.stream).format } {
+            ffi::Enum_SoundIoFormat::SoundIoFormatInvalid => {
+                Err(ffi::Enum_SoundIoError::SoundIoErrorInvalid)
+            }
+            fmt @ _ => Ok(fmt),
+        }
+    }
+
+    pub fn get_layout(&self) -> ChannelLayout {
+        ChannelLayout { layout: unsafe { &(*self.stream).layout } }
+    }
+
+    pub fn get_sample_rate(&self) -> i32 {
+        unsafe { (*self.stream).sample_rate as i32 }
+    }
+
+    pub fn get_device(&self) -> Device {
+        let dev = Device { device: unsafe { (*self.stream).device } };
+        dev.inc_ref();
+        dev
+    }
 }
 impl Drop for OutStream {
     fn drop(&mut self) {
