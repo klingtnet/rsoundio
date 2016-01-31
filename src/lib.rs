@@ -55,6 +55,13 @@ impl SoundIo {
         }
     }
 
+    pub fn current_backend(&self) -> Option<ffi::Enum_SoundIoBackend> {
+         match unsafe { (*self.context).current_backend } {
+            ffi::Enum_SoundIoBackend::SoundIoBackendNone => None,
+            backend @ _ => Some(backend),
+        }
+    }
+
     pub fn have_backend(&self, backend: ffi::Enum_SoundIoBackend) -> bool {
         unsafe { ffi::soundio_have_backend(backend) == 1u8 }
     }
