@@ -350,7 +350,6 @@ impl OutStream {
                        areas: *mut *mut ffi::Struct_SoundIoChannelArea,
                        frame_count: *mut c_int)
                        -> Option<ffi::Enum_SoundIoError> {
-        unimplemented!();
         match unsafe { ffi::soundio_outstream_begin_write(self.stream, areas, frame_count) } {
             ffi::Enum_SoundIoError::SoundIoErrorNone => None,
             err @ _ => Some(err),
