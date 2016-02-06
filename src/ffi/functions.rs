@@ -1,4 +1,4 @@
-use std::os::raw::{c_int, c_double, c_void, c_char};
+use std::os::raw::{c_int, c_double, c_char};
 
 use ffi::enums::*;
 use ffi::structs::*;
