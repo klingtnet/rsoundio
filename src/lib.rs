@@ -309,7 +309,9 @@ impl PartialEq for Device {
 }
 
 pub struct OutStream {
-    stream: *mut ffi::Struct_SoundIoOutStream,
+    // TODO: make this private again after
+    // implementint the callback register methods
+    pub stream: *mut ffi::Struct_SoundIoOutStream,
 }
 impl OutStream {
     pub fn new(raw_stream: *mut ffi::Struct_SoundIoOutStream) -> Self {
