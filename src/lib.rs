@@ -20,18 +20,18 @@ impl SoundIo {
         }
     }
 
-    pub fn connect(&self) -> Option<ffi::Enum_SoundIoError> {
+    pub fn connect(&self) -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_connect(self.context) } {
-            ffi::Enum_SoundIoError::SoundIoErrorNone => None,
+            ffi::SioError::SoundIoErrorNone => None,
             err @ _ => Some(err),
         }
     }
 
     pub fn connect_backend(&self,
-                           backend: ffi::Enum_SoundIoBackend)
-                           -> Option<ffi::Enum_SoundIoError> {
+                           backend: ffi::SioBackend)
+                           -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_connect_backend(self.context, backend) } {
-            ffi::Enum_SoundIoError::SoundIoErrorNone => None,
+            ffi::SioError::SoundIoErrorNone => None,
             err @ _ => {
                 println!("{:?}", err);
                 Some(err)
@@ -48,21 +48,21 @@ impl SoundIo {
         }
     }
 
-    pub fn get_backend(&self, idx: i32) -> Option<ffi::Enum_SoundIoBackend> {
+    pub fn get_backend(&self, idx: i32) -> Option<ffi::SioBackend> {
         match unsafe { ffi::soundio_get_backend(self.context, idx) } {
-            ffi::Enum_SoundIoBackend::SoundIoBackendNone => None,
+            ffi::SioBackend::SoundIoBackendNone => None,
             backend @ _ => Some(backend),
         }
     }
 
-    pub fn current_backend(&self) -> Option<ffi::Enum_SoundIoBackend> {
+    pub fn current_backend(&self) -> Option<ffi::SioBackend> {
         match unsafe { (*self.context).current_backend } {
-            ffi::Enum_SoundIoBackend::SoundIoBackendNone => None,
+            ffi::SioBackend::SoundIoBackendNone => None,
             backend @ _ => Some(backend),
         }
     }
 
-    pub fn have_backend(&self, backend: ffi::Enum_SoundIoBackend) -> bool {
+    pub fn have_backend(&self, backend: ffi::SioBackend) -> bool {
         unsafe { ffi::soundio_have_backend(backend) == 1u8 }
     }
 
@@ -175,7 +175,7 @@ impl ChannelLayout {
     }
 
 
-    pub fn find_channel(&self, channel: ffi::Enum_SoundIoChannelId) -> Option<i32> {
+    pub fn find_channel(&self, channel: ffi::SioChannelId) -> Option<i32> {
         match unsafe { ffi::soundio_channel_layout_find_channel(self.layout, channel) } {
             -1 => None,
             idx @ _ => Some(idx),
@@ -256,7 +256,7 @@ impl Device {
         unsafe { ffi::soundio_device_sort_channel_layouts(self.device) }
     }
 
-    pub fn supports_format(&self, format: ffi::Enum_SoundIoFormat) -> bool {
+    pub fn supports_format(&self, format: ffi::SioFormat) -> bool {
         unsafe { ffi::soundio_device_supports_format(self.device, format) == 1u8 }
     }
 
@@ -318,16 +318,16 @@ impl OutStream {
         OutStream { stream: raw_stream }
     }
 
-    pub fn open(&self) -> Option<ffi::Enum_SoundIoError> {
+    pub fn open(&self) -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_outstream_open(self.stream) } {
-            ffi::Enum_SoundIoError::SoundIoErrorNone => None,
+            ffi::SioError::SoundIoErrorNone => None,
             err @ _ => Some(err),
         }
     }
 
-    pub fn start(&self) -> Option<ffi::Enum_SoundIoError> {
+    pub fn start(&self) -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_outstream_start(self.stream) } {
-            ffi::Enum_SoundIoError::SoundIoErrorNone => None,
+            ffi::SioError::SoundIoErrorNone => None,
             err @ _ => Some(err),
         }
     }
@@ -349,53 +349,53 @@ impl OutStream {
     pub fn begin_write(&self,
                        areas: *mut *mut ffi::Struct_SoundIoChannelArea,
                        frame_count: *mut c_int)
-                       -> Option<ffi::Enum_SoundIoError> {
+                       -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_outstream_begin_write(self.stream, areas, frame_count) } {
-            ffi::Enum_SoundIoError::SoundIoErrorNone => None,
+            ffi::SioError::SoundIoErrorNone => None,
             err @ _ => Some(err),
         }
     }
 
-    pub fn end_write(&self) -> Option<ffi::Enum_SoundIoError> {
+    pub fn end_write(&self) -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_outstream_end_write(self.stream) } {
-            ffi::Enum_SoundIoError::SoundIoErrorNone => None,
+            ffi::SioError::SoundIoErrorNone => None,
             err @ _ => Some(err),
         }
     }
 
-    pub fn clear_buffer(&self) -> Option<ffi::Enum_SoundIoError> {
+    pub fn clear_buffer(&self) -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_outstream_clear_buffer(self.stream) } {
-            ffi::Enum_SoundIoError::SoundIoErrorNone => None,
+            ffi::SioError::SoundIoErrorNone => None,
             err @ _ => Some(err),
         }
     }
 
-    pub fn pause(&self, pause: bool) -> Option<ffi::Enum_SoundIoError> {
+    pub fn pause(&self, pause: bool) -> Option<ffi::SioError> {
         let pause_c_bool = match pause {
             true => 1u8,
             false => 0u8,
         };
         match unsafe { ffi::soundio_outstream_pause(self.stream, pause_c_bool) } {
-            ffi::Enum_SoundIoError::SoundIoErrorNone => None,
+            ffi::SioError::SoundIoErrorNone => None,
             err @ _ => Some(err),
         }
     }
 
-    pub fn get_latency(&self) -> Result<f64, ffi::Enum_SoundIoError> {
+    pub fn get_latency(&self) -> Result<f64, ffi::SioError> {
         let mut latency = 0.0f64;
         match unsafe {
             ffi::soundio_outstream_get_latency(self.stream, &mut latency as *mut c_double)
         } {
-            ffi::Enum_SoundIoError::SoundIoErrorNone => Ok(latency),
+            ffi::SioError::SoundIoErrorNone => Ok(latency),
             err @ _ => Err(err),
         }
 
     }
 
-    pub fn current_format(&self) -> Result<ffi::Enum_SoundIoFormat, ffi::Enum_SoundIoError> {
+    pub fn current_format(&self) -> Result<ffi::SioFormat, ffi::SioError> {
         match unsafe { (*self.stream).format } {
-            ffi::Enum_SoundIoFormat::SoundIoFormatInvalid => {
-                Err(ffi::Enum_SoundIoError::SoundIoErrorInvalid)
+            ffi::SioFormat::SoundIoFormatInvalid => {
+                Err(ffi::SioError::Invalid)
             }
             fmt @ _ => Ok(fmt),
         }

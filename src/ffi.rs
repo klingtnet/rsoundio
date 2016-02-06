@@ -14,7 +14,7 @@ pub fn ptr_to_string(str_ptr: *const c_char) -> Result<String, Utf8Error> {
 #[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(u32)]
-pub enum Enum_SoundIoError {
+pub enum SioError {
     SoundIoErrorNone = 0,
     SoundIoErrorNoMem = 1,
     SoundIoErrorInitAudioBackend = 2,
@@ -32,7 +32,7 @@ pub enum Enum_SoundIoError {
     SoundIoErrorUnderflow = 14,
     SoundIoErrorEncodingString = 15,
 }
-impl Display for Enum_SoundIoError {
+impl Display for SioError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         let str_ptr = unsafe { soundio_strerror(*self) };
         write!(f, "{}", ptr_to_string(str_ptr).unwrap())
@@ -42,7 +42,7 @@ impl Display for Enum_SoundIoError {
 #[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy, PartialEq, Debug)]
 #[repr(u32)]
-pub enum Enum_SoundIoChannelId {
+pub enum SioChannelId {
     SoundIoChannelIdInvalid = 0,
     SoundIoChannelIdFrontLeft = 1,
     SoundIoChannelIdFrontRight = 2,
@@ -113,13 +113,13 @@ pub enum Enum_SoundIoChannelId {
     SoundIoChannelIdAux14 = 67,
     SoundIoChannelIdAux15 = 68,
 }
-impl Display for Enum_SoundIoChannelId {
+impl Display for SioChannelId {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         let str_ptr = unsafe { soundio_get_channel_name(*self) };
         write!(f, "{}", ptr_to_string(str_ptr).unwrap())
     }
 }
-impl From<String> for Enum_SoundIoChannelId {
+impl From<String> for SioChannelId {
     fn from(id: String) -> Self {
         let str_len = id.len() as i32;
         let cstr = CString::new(id).unwrap();
@@ -130,7 +130,7 @@ impl From<String> for Enum_SoundIoChannelId {
 #[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy)]
 #[repr(u32)]
-pub enum Enum_SoundIoChannelLayoutId {
+pub enum SioChannelLayoutId {
     SoundIoChannelLayoutIdMono = 0,
     SoundIoChannelLayoutIdStereo = 1,
     SoundIoChannelLayoutId2Point1 = 2,
@@ -162,7 +162,7 @@ pub enum Enum_SoundIoChannelLayoutId {
 #[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy)]
 #[repr(u32)]
-pub enum Enum_SoundIoBackend {
+pub enum SioBackend {
     SoundIoBackendNone = 0,
     SoundIoBackendJack = 1,
     SoundIoBackendPulseAudio = 2,
@@ -171,7 +171,7 @@ pub enum Enum_SoundIoBackend {
     SoundIoBackendWasapi = 5,
     SoundIoBackendDummy = 6,
 }
-impl Display for Enum_SoundIoBackend {
+impl Display for SioBackend {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         let str_ptr = unsafe { soundio_backend_name(*self) };
         write!(f, "{}", ptr_to_string(str_ptr).unwrap())
@@ -181,7 +181,7 @@ impl Display for Enum_SoundIoBackend {
 #[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy)]
 #[repr(u32)]
-pub enum Enum_SoundIoDeviceAim {
+pub enum SioDeviceAim {
     SoundIoDeviceAimInput = 0,
     SoundIoDeviceAimOutput = 1,
 }
@@ -189,7 +189,7 @@ pub enum Enum_SoundIoDeviceAim {
 #[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy)]
 #[repr(u32)]
-pub enum Enum_SoundIoFormat {
+pub enum SioFormat {
     SoundIoFormatInvalid = 0,
     SoundIoFormatS8 = 1,
     SoundIoFormatU8 = 2,
@@ -210,13 +210,13 @@ pub enum Enum_SoundIoFormat {
     SoundIoFormatFloat64LE = 17,
     SoundIoFormatFloat64BE = 18,
 }
-impl Display for Enum_SoundIoFormat {
+impl Display for SioFormat {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         let str_ptr = unsafe { soundio_format_string(*self) };
         write!(f, "{}", ptr_to_string(str_ptr).unwrap())
     }
 }
-impl Enum_SoundIoFormat {
+impl SioFormat {
     pub fn get_bytes_per_sample(self) -> i32 {
         unsafe { soundio_get_bytes_per_sample(self) as i32 }
     }
@@ -227,7 +227,7 @@ impl Enum_SoundIoFormat {
 pub struct Struct_SoundIoChannelLayout {
     pub name: *const c_char,
     pub channel_count: c_int,
-    pub channels: [Enum_SoundIoChannelId; 24usize],
+    pub channels: [SioChannelId; 24usize],
 }
 impl ::std::clone::Clone for Struct_SoundIoChannelLayout {
     fn clone(&self) -> Self {
@@ -285,7 +285,7 @@ pub struct Struct_SoundIo {
                                                                               c_int)>,
     pub on_events_signal: ::std::option::Option<unsafe extern "C" fn(arg1:
                                                                          *mut Struct_SoundIo)>,
-    pub current_backend: Enum_SoundIoBackend,
+    pub current_backend: SioBackend,
     pub app_name: *const c_char,
     pub emit_rtprio_warning: ::std::option::Option<extern "C" fn()>,
     pub jack_info_callback: ::std::option::Option<unsafe extern "C" fn(msg:
@@ -310,13 +310,13 @@ pub struct Struct_SoundIoDevice {
     pub soundio: *mut Struct_SoundIo,
     pub id: *mut c_char,
     pub name: *mut c_char,
-    pub aim: Enum_SoundIoDeviceAim,
+    pub aim: SioDeviceAim,
     pub layouts: *mut Struct_SoundIoChannelLayout,
     pub layout_count: c_int,
     pub current_layout: Struct_SoundIoChannelLayout,
-    pub formats: *mut Enum_SoundIoFormat,
+    pub formats: *mut SioFormat,
     pub format_count: c_int,
-    pub current_format: Enum_SoundIoFormat,
+    pub current_format: SioFormat,
     pub sample_rates: *mut Struct_SoundIoSampleRateRange,
     pub sample_rate_count: c_int,
     pub sample_rate_current: c_int,
@@ -342,7 +342,7 @@ impl ::std::default::Default for Struct_SoundIoDevice {
 #[derive(Copy)]
 pub struct Struct_SoundIoOutStream {
     pub device: *mut Struct_SoundIoDevice,
-    pub format: Enum_SoundIoFormat,
+    pub format: SioFormat,
     pub sample_rate: c_int,
     pub layout: Struct_SoundIoChannelLayout,
     pub software_latency: ::std::os::raw::c_double,
@@ -379,7 +379,7 @@ impl ::std::default::Default for Struct_SoundIoOutStream {
 #[derive(Copy)]
 pub struct Struct_SoundIoInStream {
     pub device: *mut Struct_SoundIoDevice,
-    pub format: Enum_SoundIoFormat,
+    pub format: SioFormat,
     pub sample_rate: c_int,
     pub layout: Struct_SoundIoChannelLayout,
     pub software_latency: ::std::os::raw::c_double,
@@ -420,16 +420,16 @@ pub enum Struct_SoundIoRingBuffer { }
 extern "C" {
     pub fn soundio_create() -> *mut Struct_SoundIo;
     pub fn soundio_destroy(soundio: *mut Struct_SoundIo);
-    pub fn soundio_connect(soundio: *mut Struct_SoundIo) -> Enum_SoundIoError;
+    pub fn soundio_connect(soundio: *mut Struct_SoundIo) -> SioError;
     pub fn soundio_connect_backend(soundio: *mut Struct_SoundIo,
-                                   backend: Enum_SoundIoBackend)
-                                   -> Enum_SoundIoError;
+                                   backend: SioBackend)
+                                   -> SioError;
     pub fn soundio_disconnect(soundio: *mut Struct_SoundIo);
-    pub fn soundio_strerror(error: Enum_SoundIoError) -> *const c_char;
-    pub fn soundio_backend_name(backend: Enum_SoundIoBackend) -> *const c_char;
+    pub fn soundio_strerror(error: SioError) -> *const c_char;
+    pub fn soundio_backend_name(backend: SioBackend) -> *const c_char;
     pub fn soundio_backend_count(soundio: *mut Struct_SoundIo) -> c_int;
-    pub fn soundio_get_backend(soundio: *mut Struct_SoundIo, index: c_int) -> Enum_SoundIoBackend;
-    pub fn soundio_have_backend(backend: Enum_SoundIoBackend) -> u8;
+    pub fn soundio_get_backend(soundio: *mut Struct_SoundIo, index: c_int) -> SioBackend;
+    pub fn soundio_have_backend(backend: SioBackend) -> u8;
     pub fn soundio_flush_events(soundio: *mut Struct_SoundIo);
     pub fn soundio_wait_events(soundio: *mut Struct_SoundIo);
     pub fn soundio_wakeup(soundio: *mut Struct_SoundIo);
@@ -437,14 +437,14 @@ extern "C" {
     pub fn soundio_channel_layout_equal(a: *const Struct_SoundIoChannelLayout,
                                         b: *const Struct_SoundIoChannelLayout)
                                         -> u8;
-    pub fn soundio_get_channel_name(id: Enum_SoundIoChannelId) -> *const c_char;
-    pub fn soundio_parse_channel_id(str: *const c_char, str_len: c_int) -> Enum_SoundIoChannelId;
+    pub fn soundio_get_channel_name(id: SioChannelId) -> *const c_char;
+    pub fn soundio_parse_channel_id(str: *const c_char, str_len: c_int) -> SioChannelId;
     pub fn soundio_channel_layout_builtin_count() -> c_int;
     pub fn soundio_channel_layout_get_builtin(index: c_int) -> *const Struct_SoundIoChannelLayout;
     pub fn soundio_channel_layout_get_default(channel_count: c_int)
                                               -> *const Struct_SoundIoChannelLayout;
     pub fn soundio_channel_layout_find_channel(layout: *const Struct_SoundIoChannelLayout,
-                                               channel: Enum_SoundIoChannelId)
+                                               channel: SioChannelId)
                                                -> c_int;
     pub fn soundio_channel_layout_detect_builtin(layout: *mut Struct_SoundIoChannelLayout) -> u8;
     pub fn soundio_best_matching_channel_layout(preferred_layouts:
@@ -462,8 +462,8 @@ extern "C" {
     // make the `*mut` pointer.
     pub fn soundio_sort_channel_layouts(layouts: *mut Struct_SoundIoChannelLayout,
                                         layout_count: c_int);
-    pub fn soundio_get_bytes_per_sample(format: Enum_SoundIoFormat) -> c_int;
-    pub fn soundio_format_string(format: Enum_SoundIoFormat) -> *const c_char;
+    pub fn soundio_get_bytes_per_sample(format: SioFormat) -> c_int;
+    pub fn soundio_format_string(format: SioFormat) -> *const c_char;
     pub fn soundio_input_device_count(soundio: *mut Struct_SoundIo) -> c_int;
     pub fn soundio_output_device_count(soundio: *mut Struct_SoundIo) -> c_int;
     pub fn soundio_get_input_device(soundio: *mut Struct_SoundIo,
@@ -481,7 +481,7 @@ extern "C" {
                                 -> u8;
     pub fn soundio_device_sort_channel_layouts(device: *mut Struct_SoundIoDevice);
     pub fn soundio_device_supports_format(device: *mut Struct_SoundIoDevice,
-                                          format: Enum_SoundIoFormat)
+                                          format: SioFormat)
                                           -> u8;
     pub fn soundio_device_supports_layout(device: *mut Struct_SoundIoDevice,
                                           layout: *const Struct_SoundIoChannelLayout)
@@ -495,21 +495,21 @@ extern "C" {
     pub fn soundio_outstream_create(device: *mut Struct_SoundIoDevice)
                                     -> *mut Struct_SoundIoOutStream;
     pub fn soundio_outstream_destroy(outstream: *mut Struct_SoundIoOutStream);
-    pub fn soundio_outstream_open(outstream: *mut Struct_SoundIoOutStream) -> Enum_SoundIoError;
-    pub fn soundio_outstream_start(outstream: *mut Struct_SoundIoOutStream) -> Enum_SoundIoError;
+    pub fn soundio_outstream_open(outstream: *mut Struct_SoundIoOutStream) -> SioError;
+    pub fn soundio_outstream_start(outstream: *mut Struct_SoundIoOutStream) -> SioError;
     pub fn soundio_outstream_begin_write(outstream: *mut Struct_SoundIoOutStream,
                                          areas: *mut *mut Struct_SoundIoChannelArea,
                                          frame_count: *mut c_int)
-                                         -> Enum_SoundIoError;
-    pub fn soundio_outstream_end_write(outstream: *mut Struct_SoundIoOutStream) -> Enum_SoundIoError;
+                                         -> SioError;
+    pub fn soundio_outstream_end_write(outstream: *mut Struct_SoundIoOutStream) -> SioError;
     pub fn soundio_outstream_clear_buffer(outstream: *mut Struct_SoundIoOutStream)
-                                          -> Enum_SoundIoError;
+                                          -> SioError;
     pub fn soundio_outstream_pause(outstream: *mut Struct_SoundIoOutStream,
                                    pause: u8)
-                                   -> Enum_SoundIoError;
+                                   -> SioError;
     pub fn soundio_outstream_get_latency(outstream: *mut Struct_SoundIoOutStream,
                                          out_latency: *mut ::std::os::raw::c_double)
-                                         -> Enum_SoundIoError;
+                                         -> SioError;
     pub fn soundio_instream_create(device: *mut Struct_SoundIoDevice) -> *mut Struct_SoundIoInStream;
     pub fn soundio_instream_destroy(instream: *mut Struct_SoundIoInStream);
     pub fn soundio_instream_open(instream: *mut Struct_SoundIoInStream) -> c_int;
