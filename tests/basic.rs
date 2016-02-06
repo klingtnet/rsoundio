@@ -29,9 +29,9 @@ fn test_channel_layout() {
                rsoundio::ChannelLayout::get_builtin(0));
     let mut layout = rsoundio::ChannelLayout::get_default(2).unwrap();
     assert!(layout.detect_builtin());
-    assert!(layout.find_channel(rsoundio::ffi::SioChannelId::SoundIoChannelIdFrontLeft)
+    assert!(layout.find_channel(rsoundio::ffi::SioChannelId::FrontLeft)
                   .is_some());
-    assert!(layout.find_channel(rsoundio::ffi::SioChannelId::SoundIoChannelIdLfe2)
+    assert!(layout.find_channel(rsoundio::ffi::SioChannelId::Lfe2)
                   .is_none());
     assert!(cnt > 2);
     let preferred = [rsoundio::ChannelLayout::get_builtin(0).unwrap(),
@@ -52,11 +52,11 @@ fn test_enums() {
                format!("{}", rsoundio::ffi::SioBackend::SoundIoBackendAlsa));
     assert_eq!("Front Left",
                format!("{}",
-                       rsoundio::ffi::SioChannelId::SoundIoChannelIdFrontLeft));
+                       rsoundio::ffi::SioChannelId::FrontLeft));
     assert_eq!(rsoundio::ffi::SioChannelId::from("Front Left".to_string()),
-               rsoundio::ffi::SioChannelId::SoundIoChannelIdFrontLeft);
+               rsoundio::ffi::SioChannelId::FrontLeft);
     assert!(rsoundio::ffi::SioChannelId::from("SomeInvalidBoredom".to_string()) !=
-            rsoundio::ffi::SioChannelId::SoundIoChannelIdFrontLeft);
+            rsoundio::ffi::SioChannelId::FrontLeft);
     assert_eq!("unsigned 8-bit",
                format!("{}", rsoundio::ffi::SioFormat::SoundIoFormatU8));
     assert_eq!(1,
