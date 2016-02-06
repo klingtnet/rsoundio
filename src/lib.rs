@@ -22,7 +22,7 @@ impl SoundIo {
 
     pub fn connect(&self) -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_connect(self.context) } {
-            ffi::SioError::SoundIoErrorNone => None,
+            ffi::SioError::None => None,
             err @ _ => Some(err),
         }
     }
@@ -31,7 +31,7 @@ impl SoundIo {
                            backend: ffi::SioBackend)
                            -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_connect_backend(self.context, backend) } {
-            ffi::SioError::SoundIoErrorNone => None,
+            ffi::SioError::None => None,
             err @ _ => {
                 println!("{:?}", err);
                 Some(err)
@@ -320,14 +320,14 @@ impl OutStream {
 
     pub fn open(&self) -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_outstream_open(self.stream) } {
-            ffi::SioError::SoundIoErrorNone => None,
+            ffi::SioError::None => None,
             err @ _ => Some(err),
         }
     }
 
     pub fn start(&self) -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_outstream_start(self.stream) } {
-            ffi::SioError::SoundIoErrorNone => None,
+            ffi::SioError::None => None,
             err @ _ => Some(err),
         }
     }
@@ -351,21 +351,21 @@ impl OutStream {
                        frame_count: *mut c_int)
                        -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_outstream_begin_write(self.stream, areas, frame_count) } {
-            ffi::SioError::SoundIoErrorNone => None,
+            ffi::SioError::None => None,
             err @ _ => Some(err),
         }
     }
 
     pub fn end_write(&self) -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_outstream_end_write(self.stream) } {
-            ffi::SioError::SoundIoErrorNone => None,
+            ffi::SioError::None => None,
             err @ _ => Some(err),
         }
     }
 
     pub fn clear_buffer(&self) -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_outstream_clear_buffer(self.stream) } {
-            ffi::SioError::SoundIoErrorNone => None,
+            ffi::SioError::None => None,
             err @ _ => Some(err),
         }
     }
@@ -376,7 +376,7 @@ impl OutStream {
             false => 0u8,
         };
         match unsafe { ffi::soundio_outstream_pause(self.stream, pause_c_bool) } {
-            ffi::SioError::SoundIoErrorNone => None,
+            ffi::SioError::None => None,
             err @ _ => Some(err),
         }
     }
@@ -386,7 +386,7 @@ impl OutStream {
         match unsafe {
             ffi::soundio_outstream_get_latency(self.stream, &mut latency as *mut c_double)
         } {
-            ffi::SioError::SoundIoErrorNone => Ok(latency),
+            ffi::SioError::None => Ok(latency),
             err @ _ => Err(err),
         }
 

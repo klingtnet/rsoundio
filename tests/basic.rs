@@ -47,7 +47,7 @@ fn test_channel_layout() {
 #[test]
 fn test_enums() {
     assert_eq!("(no error)",
-               format!("{}", rsoundio::ffi::SioError::SoundIoErrorNone));
+               format!("{}", rsoundio::ffi::SioError::None));
     assert_eq!("ALSA",
                format!("{}", rsoundio::ffi::SioBackend::SoundIoBackendAlsa));
     assert_eq!("Front Left",

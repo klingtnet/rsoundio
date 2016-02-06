@@ -15,22 +15,22 @@ pub fn ptr_to_string(str_ptr: *const c_char) -> Result<String, Utf8Error> {
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(u32)]
 pub enum SioError {
-    SoundIoErrorNone = 0,
-    SoundIoErrorNoMem = 1,
-    SoundIoErrorInitAudioBackend = 2,
-    SoundIoErrorSystemResources = 3,
-    SoundIoErrorOpeningDevice = 4,
-    SoundIoErrorNoSuchDevice = 5,
-    SoundIoErrorInvalid = 6,
-    SoundIoErrorBackendUnavailable = 7,
-    SoundIoErrorStreaming = 8,
-    SoundIoErrorIncompatibleDevice = 9,
-    SoundIoErrorNoSuchClient = 10,
-    SoundIoErrorIncompatibleBackend = 11,
-    SoundIoErrorBackendDisconnected = 12,
-    SoundIoErrorInterrupted = 13,
-    SoundIoErrorUnderflow = 14,
-    SoundIoErrorEncodingString = 15,
+    None = 0,
+    NoMem = 1,
+    InitAudioBackend = 2,
+    SystemResources = 3,
+    OpeningDevice = 4,
+    NoSuchDevice = 5,
+    Invalid = 6,
+    BackendUnavailable = 7,
+    Streaming = 8,
+    IncompatibleDevice = 9,
+    NoSuchClient = 10,
+    IncompatibleBackend = 11,
+    BackendDisconnected = 12,
+    Interrupted = 13,
+    Underflow = 14,
+    EncodingString = 15,
 }
 impl Display for SioError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
