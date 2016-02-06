@@ -414,7 +414,7 @@ impl OutStream {
         dev
     }
 
-    pub fn destroy(&mut self) {
+    pub fn destroy(&self) {
         unsafe { ffi::soundio_outstream_destroy(self.stream) }
     }
 }
