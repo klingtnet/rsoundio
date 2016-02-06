@@ -7,7 +7,7 @@ fn test_outstream() {
     println!("test: OutStream");
     let sio = rsoundio::SoundIo::new();
     assert!(sio.connect().is_none());
-    // assert!(sio.connect_backend(rsoundio::ffi::SioBackend::SoundIoBackendAlsa).is_none());
+    // assert!(sio.connect_backend(rsoundio::ffi::SioBackend::Alsa).is_none());
     println!("current backend: {}", sio.current_backend().unwrap());
     sio.flush_events();
     let dev_idx = sio.default_output_device_index().unwrap();

@@ -163,13 +163,13 @@ pub enum SioChannelLayoutId {
 #[derive(Clone, Copy)]
 #[repr(u32)]
 pub enum SioBackend {
-    SoundIoBackendNone = 0,
-    SoundIoBackendJack = 1,
-    SoundIoBackendPulseAudio = 2,
-    SoundIoBackendAlsa = 3,
-    SoundIoBackendCoreAudio = 4,
-    SoundIoBackendWasapi = 5,
-    SoundIoBackendDummy = 6,
+    None = 0,
+    Jack = 1,
+    PulseAudio = 2,
+    Alsa = 3,
+    CoreAudio = 4,
+    Wasapi = 5,
+    Dummy = 6,
 }
 impl Display for SioBackend {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
@@ -182,33 +182,33 @@ impl Display for SioBackend {
 #[derive(Clone, Copy)]
 #[repr(u32)]
 pub enum SioDeviceAim {
-    SoundIoDeviceAimInput = 0,
-    SoundIoDeviceAimOutput = 1,
+    Input = 0,
+    Output = 1,
 }
 
 #[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy)]
 #[repr(u32)]
 pub enum SioFormat {
-    SoundIoFormatInvalid = 0,
-    SoundIoFormatS8 = 1,
-    SoundIoFormatU8 = 2,
-    SoundIoFormatS16LE = 3,
-    SoundIoFormatS16BE = 4,
-    SoundIoFormatU16LE = 5,
-    SoundIoFormatU16BE = 6,
-    SoundIoFormatS24LE = 7,
-    SoundIoFormatS24BE = 8,
-    SoundIoFormatU24LE = 9,
-    SoundIoFormatU24BE = 10,
-    SoundIoFormatS32LE = 11,
-    SoundIoFormatS32BE = 12,
-    SoundIoFormatU32LE = 13,
-    SoundIoFormatU32BE = 14,
-    SoundIoFormatFloat32LE = 15,
-    SoundIoFormatFloat32BE = 16,
-    SoundIoFormatFloat64LE = 17,
-    SoundIoFormatFloat64BE = 18,
+    Invalid = 0,
+    S8 = 1,
+    U8 = 2,
+    S16LE = 3,
+    S16BE = 4,
+    U16LE = 5,
+    U16BE = 6,
+    S24LE = 7,
+    S24BE = 8,
+    U24LE = 9,
+    U24BE = 10,
+    S32LE = 11,
+    S32BE = 12,
+    U32LE = 13,
+    U32BE = 14,
+    Float32LE = 15,
+    Float32BE = 16,
+    Float64LE = 17,
+    Float64BE = 18,
 }
 impl Display for SioFormat {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {

@@ -8,8 +8,8 @@ fn test_soundio() {
     assert!(sio.get_backend(-1).is_none());
     assert!(sio.connect().is_none());
     sio.disconnect();
-    if sio.have_backend(rsoundio::ffi::SioBackend::SoundIoBackendAlsa) {
-        assert!(sio.connect_backend(rsoundio::ffi::SioBackend::SoundIoBackendAlsa)
+    if sio.have_backend(rsoundio::ffi::SioBackend::Alsa) {
+        assert!(sio.connect_backend(rsoundio::ffi::SioBackend::Alsa)
                    .is_none());
         sio.disconnect();
     }
@@ -49,7 +49,7 @@ fn test_enums() {
     assert_eq!("(no error)",
                format!("{}", rsoundio::ffi::SioError::None));
     assert_eq!("ALSA",
-               format!("{}", rsoundio::ffi::SioBackend::SoundIoBackendAlsa));
+               format!("{}", rsoundio::ffi::SioBackend::Alsa));
     assert_eq!("Front Left",
                format!("{}",
                        rsoundio::ffi::SioChannelId::FrontLeft));
@@ -58,11 +58,11 @@ fn test_enums() {
     assert!(rsoundio::ffi::SioChannelId::from("SomeInvalidBoredom".to_string()) !=
             rsoundio::ffi::SioChannelId::FrontLeft);
     assert_eq!("unsigned 8-bit",
-               format!("{}", rsoundio::ffi::SioFormat::SoundIoFormatU8));
+               format!("{}", rsoundio::ffi::SioFormat::U8));
     assert_eq!(1,
-               rsoundio::ffi::SioFormat::SoundIoFormatU8.get_bytes_per_sample());
+               rsoundio::ffi::SioFormat::U8.get_bytes_per_sample());
     assert_eq!(4,
-               rsoundio::ffi::SioFormat::SoundIoFormatU32LE.get_bytes_per_sample());
+               rsoundio::ffi::SioFormat::U32LE.get_bytes_per_sample());
 }
 
 #[test]
@@ -80,8 +80,8 @@ fn test_device() {
     assert_eq!(in_dev, in_dev);
     out_dev.sort_channel_layouts();
     let stereo_layout = rsoundio::ChannelLayout::get_default(2).unwrap();
-    assert!(in_dev.supports_format(rsoundio::ffi::SioFormat::SoundIoFormatFloat32LE));
-    assert!(out_dev.supports_format(rsoundio::ffi::SioFormat::SoundIoFormatFloat32LE));
+    assert!(in_dev.supports_format(rsoundio::ffi::SioFormat::Float32LE));
+    assert!(out_dev.supports_format(rsoundio::ffi::SioFormat::Float32LE));
     assert!(in_dev.supports_layout(&stereo_layout));
     assert!(out_dev.supports_layout(&stereo_layout));
     assert!(in_dev.supports_sample_rate(48_000));

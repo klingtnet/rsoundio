@@ -50,14 +50,14 @@ impl SoundIo {
 
     pub fn get_backend(&self, idx: i32) -> Option<ffi::SioBackend> {
         match unsafe { ffi::soundio_get_backend(self.context, idx) } {
-            ffi::SioBackend::SoundIoBackendNone => None,
+            ffi::SioBackend::None => None,
             backend @ _ => Some(backend),
         }
     }
 
     pub fn current_backend(&self) -> Option<ffi::SioBackend> {
         match unsafe { (*self.context).current_backend } {
-            ffi::SioBackend::SoundIoBackendNone => None,
+            ffi::SioBackend::None => None,
             backend @ _ => Some(backend),
         }
     }
@@ -394,7 +394,7 @@ impl OutStream {
 
     pub fn current_format(&self) -> Result<ffi::SioFormat, ffi::SioError> {
         match unsafe { (*self.stream).format } {
-            ffi::SioFormat::SoundIoFormatInvalid => {
+            ffi::SioFormat::Invalid => {
                 Err(ffi::SioError::Invalid)
             }
             fmt @ _ => Ok(fmt),
