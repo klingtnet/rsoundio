@@ -213,6 +213,10 @@ impl ChannelLayout {
             Some(ChannelLayout::new(layout_ptr))
         }
     }
+
+    pub fn channel_count(&self) -> i32 {
+        unsafe { (*self.layout).channel_count as i32 }
+    }
 }
 impl PartialEq for ChannelLayout {
     fn eq(&self, other: &Self) -> bool {
