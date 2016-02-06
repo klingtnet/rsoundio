@@ -1,4 +1,4 @@
-mod ffi;
+pub mod ffi;
 
 use std::os::raw::{c_int, c_double};
 use std::fmt::Display;
