@@ -4,7 +4,7 @@ use std::os::raw::{c_int, c_double};
 use std::fmt::Display;
 
 pub struct SoundIo {
-    context: *mut ffi::Struct_SoundIo,
+    context: *mut ffi::SoundIo,
 }
 impl SoundIo {
     pub fn new() -> Self {
@@ -147,10 +147,10 @@ impl Drop for SoundIo {
 
 #[derive(Debug)]
 pub struct ChannelLayout {
-    layout: *const ffi::Struct_SoundIoChannelLayout,
+    layout: *const ffi::SoundIoChannelLayout,
 }
 impl ChannelLayout {
-    fn new(raw_layout: *const ffi::Struct_SoundIoChannelLayout) -> Self {
+    fn new(raw_layout: *const ffi::SoundIoChannelLayout) -> Self {
         ChannelLayout { layout: raw_layout }
     }
 
@@ -185,7 +185,7 @@ impl ChannelLayout {
     pub fn detect_builtin(&mut self) -> bool {
         // This is a hack because of the transmute.
         unsafe {
-            let mut_layout: *mut ffi::Struct_SoundIoChannelLayout =
+            let mut_layout: *mut ffi::SoundIoChannelLayout =
                 ::std::mem::transmute(self.layout);
             ffi::soundio_channel_layout_detect_builtin(mut_layout) == 1
         }
@@ -236,10 +236,10 @@ impl Display for ChannelLayout {
 
 #[derive(Debug)]
 pub struct Device {
-    device: *mut ffi::Struct_SoundIoDevice,
+    device: *mut ffi::SoundIoDevice,
 }
 impl Device {
-    pub fn new(dev_ptr: *mut ffi::Struct_SoundIoDevice) -> Self {
+    pub fn new(dev_ptr: *mut ffi::SoundIoDevice) -> Self {
         Device { device: dev_ptr }
     }
 
@@ -311,10 +311,10 @@ impl PartialEq for Device {
 pub struct OutStream {
     // TODO: make this private again after
     // implementint the callback register methods
-    pub stream: *mut ffi::Struct_SoundIoOutStream,
+    pub stream: *mut ffi::SoundIoOutStream,
 }
 impl OutStream {
-    pub fn new(raw_stream: *mut ffi::Struct_SoundIoOutStream) -> Self {
+    pub fn new(raw_stream: *mut ffi::SoundIoOutStream) -> Self {
         OutStream { stream: raw_stream }
     }
 
@@ -336,7 +336,7 @@ impl OutStream {
         where F: Fn(OutStream, i32, i32)
     {
         // TODO: set wrapper inside the constructor
-        unsafe extern "C" fn wrapper(out: *mut ffi::Struct_SoundIoOutStream,
+        unsafe extern "C" fn wrapper(out: *mut ffi::SoundIoOutStream,
                                      min: c_int,
                                      max: c_int) {
             unimplemented!();
@@ -347,7 +347,7 @@ impl OutStream {
     }
 
     pub fn begin_write(&self,
-                       areas: *mut *mut ffi::Struct_SoundIoChannelArea,
+                       areas: *mut *mut ffi::SoundIoChannelArea,
                        frame_count: *mut c_int)
                        -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_outstream_begin_write(self.stream, areas, frame_count) } {

@@ -29,7 +29,7 @@ fn test_outstream() {
     stream.destroy();
 }
 
-unsafe extern "C" fn write_callback(raw_out: *mut rsoundio::ffi::Struct_SoundIoOutStream,
+unsafe extern "C" fn write_callback(raw_out: *mut rsoundio::ffi::SoundIoOutStream,
                                     min_frame_count: c_int,
                                     max_frame_count: c_int) {
     let out = rsoundio::OutStream::new(raw_out);
@@ -41,7 +41,7 @@ unsafe extern "C" fn write_callback(raw_out: *mut rsoundio::ffi::Struct_SoundIoO
     // let phi = 2.0 * f * ::std::f32::consts::PI / (sr as f32);
     let mut sample = 0.0f32;
 
-    let mut raw_areas: *mut rsoundio::ffi::Struct_SoundIoChannelArea = ::std::ptr::null_mut();
+    let mut raw_areas: *mut rsoundio::ffi::SoundIoChannelArea = ::std::ptr::null_mut();
     let mut frames_left = max_frame_count;
     let mut block_size = frames_left;
     while frames_left > 0 {
