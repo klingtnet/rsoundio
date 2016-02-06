@@ -330,9 +330,29 @@ impl OutStream {
         }
     }
 
-    pub fn begin_write(&self) -> Option<ffi::Enum_SoundIoError> {
-        // TODO
-        None
+    pub fn register_callback<F>(&self, callback: F)
+        where F: Fn(OutStream, i32, i32)
+    {
+        // TODO: set wrapper inside the constructor
+        unsafe extern "C" fn wrapper(out: *mut ffi::Struct_SoundIoOutStream,
+                                     min: c_int,
+                                     max: c_int) {
+            !unimplemented();
+        };
+        unsafe {
+            (*self.stream).write_callback = Some(wrapper);
+        }
+    }
+
+    pub fn begin_write(&self,
+                       areas: *mut *mut ffi::Struct_SoundIoChannelArea,
+                       frame_count: *mut c_int)
+                       -> Option<ffi::Enum_SoundIoError> {
+        unimplemented!();
+        match unsafe { ffi::soundio_outstream_begin_write(self.stream, areas, frame_count) } {
+            ffi::Enum_SoundIoError::SoundIoErrorNone => None,
+            err @ _ => Some(err),
+        }
     }
 
     pub fn end_write(&self) -> Option<ffi::Enum_SoundIoError> {
