@@ -337,7 +337,7 @@ impl OutStream {
         unsafe extern "C" fn wrapper(out: *mut ffi::Struct_SoundIoOutStream,
                                      min: c_int,
                                      max: c_int) {
-            !unimplemented();
+            unimplemented!();
         };
         unsafe {
             (*self.stream).write_callback = Some(wrapper);
