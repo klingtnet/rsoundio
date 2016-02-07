@@ -28,9 +28,7 @@ impl SoundIo {
         }
     }
 
-    pub fn connect_backend(&self,
-                           backend: ffi::SioBackend)
-                           -> Option<ffi::SioError> {
+    pub fn connect_backend(&self, backend: ffi::SioBackend) -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_connect_backend(self.context, backend) } {
             ffi::SioError::None => None,
             err @ _ => {
@@ -186,8 +184,7 @@ impl ChannelLayout {
     pub fn detect_builtin(&mut self) -> bool {
         // This is a hack because of the transmute.
         unsafe {
-            let mut_layout: *mut ffi::SoundIoChannelLayout =
-                ::std::mem::transmute(self.layout);
+            let mut_layout: *mut ffi::SoundIoChannelLayout = ::std::mem::transmute(self.layout);
             ffi::soundio_channel_layout_detect_builtin(mut_layout) == 1
         }
     }
@@ -308,4 +305,3 @@ impl PartialEq for Device {
         !self.eq(other)
     }
 }
-

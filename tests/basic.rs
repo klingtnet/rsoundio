@@ -46,23 +46,18 @@ fn test_channel_layout() {
 
 #[test]
 fn test_enums() {
-    assert_eq!("(no error)",
-               format!("{}", rsoundio::ffi::SioError::None));
-    assert_eq!("ALSA",
-               format!("{}", rsoundio::ffi::SioBackend::Alsa));
+    assert_eq!("(no error)", format!("{}", rsoundio::ffi::SioError::None));
+    assert_eq!("ALSA", format!("{}", rsoundio::ffi::SioBackend::Alsa));
     assert_eq!("Front Left",
-               format!("{}",
-                       rsoundio::ffi::SioChannelId::FrontLeft));
+               format!("{}", rsoundio::ffi::SioChannelId::FrontLeft));
     assert_eq!(rsoundio::ffi::SioChannelId::from("Front Left".to_string()),
                rsoundio::ffi::SioChannelId::FrontLeft);
     assert!(rsoundio::ffi::SioChannelId::from("SomeInvalidBoredom".to_string()) !=
             rsoundio::ffi::SioChannelId::FrontLeft);
     assert_eq!("unsigned 8-bit",
                format!("{}", rsoundio::ffi::SioFormat::U8));
-    assert_eq!(1,
-               rsoundio::ffi::SioFormat::U8.get_bytes_per_sample());
-    assert_eq!(4,
-               rsoundio::ffi::SioFormat::U32LE.get_bytes_per_sample());
+    assert_eq!(1, rsoundio::ffi::SioFormat::U8.get_bytes_per_sample());
+    assert_eq!(4, rsoundio::ffi::SioFormat::U32LE.get_bytes_per_sample());
 }
 
 #[test]

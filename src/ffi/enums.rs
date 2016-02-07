@@ -1,6 +1,6 @@
 use std::os::raw::c_char;
 use std::fmt;
-use std::ffi::{CStr,CString};
+use std::ffi::{CStr, CString};
 use std::fmt::Display;
 use std::str::Utf8Error;
 

@@ -31,9 +31,7 @@ impl OutStream {
         where F: Fn(OutStream, i32, i32)
     {
         // TODO: set wrapper inside the constructor
-        unsafe extern "C" fn wrapper(out: *mut ffi::SoundIoOutStream,
-                                     min: c_int,
-                                     max: c_int) {
+        unsafe extern "C" fn wrapper(out: *mut ffi::SoundIoOutStream, min: c_int, max: c_int) {
             unimplemented!();
         };
         unsafe {
@@ -89,9 +87,7 @@ impl OutStream {
 
     pub fn current_format(&self) -> Result<ffi::SioFormat, ffi::SioError> {
         match unsafe { (*self.stream).format } {
-            ffi::SioFormat::Invalid => {
-                Err(ffi::SioError::Invalid)
-            }
+            ffi::SioFormat::Invalid => Err(ffi::SioError::Invalid),
             fmt @ _ => Ok(fmt),
         }
     }

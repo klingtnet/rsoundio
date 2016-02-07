@@ -60,21 +60,14 @@ impl Default for SoundIoChannelArea {
 #[derive(Copy)]
 pub struct SoundIo {
     pub userdata: *mut c_void,
-    pub on_devices_change: Option<unsafe extern "C" fn(arg1:
-                                                                          *mut SoundIo)>,
-    pub on_backend_disconnect: Option<unsafe extern "C" fn(arg1:
-                                                                              *mut SoundIo,
-                                                                          err:
-                                                                              c_int)>,
-    pub on_events_signal: Option<unsafe extern "C" fn(arg1:
-                                                                         *mut SoundIo)>,
+    pub on_devices_change: Option<unsafe extern "C" fn(arg1: *mut SoundIo)>,
+    pub on_backend_disconnect: Option<unsafe extern "C" fn(arg1: *mut SoundIo, err: c_int)>,
+    pub on_events_signal: Option<unsafe extern "C" fn(arg1: *mut SoundIo)>,
     pub current_backend: SioBackend,
     pub app_name: *const c_char,
     pub emit_rtprio_warning: Option<extern "C" fn()>,
-    pub jack_info_callback: Option<unsafe extern "C" fn(msg:
-                                                                           *const c_char)>,
-    pub jack_error_callback: Option<unsafe extern "C" fn(msg:
-                                                                            *const c_char)>,
+    pub jack_info_callback: Option<unsafe extern "C" fn(msg: *const c_char)>,
+    pub jack_error_callback: Option<unsafe extern "C" fn(msg: *const c_char)>,
 }
 impl Clone for SoundIo {
     fn clone(&self) -> Self {
@@ -130,18 +123,12 @@ pub struct SoundIoOutStream {
     pub layout: SoundIoChannelLayout,
     pub software_latency: c_double,
     pub userdata: *mut c_void,
-    pub write_callback: Option<unsafe extern "C" fn(arg1:
-                                                                       *mut SoundIoOutStream,
-                                                                   frame_count_min:
-                                                                       c_int,
-                                                                   frame_count_max:
-                                                                       c_int)>,
-    pub underflow_callback: Option<unsafe extern "C" fn(arg1:
-                                                                           *mut SoundIoOutStream)>,
-    pub error_callback: Option<unsafe extern "C" fn(arg1:
-                                                                       *mut SoundIoOutStream,
-                                                                   err:
-                                                                       c_int)>,
+    pub write_callback: Option<unsafe extern "C" fn(arg1: *mut SoundIoOutStream,
+                                                    frame_count_min: c_int,
+                                                    frame_count_max: c_int)
+                                                   >,
+    pub underflow_callback: Option<unsafe extern "C" fn(arg1: *mut SoundIoOutStream)>,
+    pub error_callback: Option<unsafe extern "C" fn(arg1: *mut SoundIoOutStream, err: c_int)>,
     pub name: *const c_char,
     pub non_terminal_hint: u8,
     pub bytes_per_frame: c_int,
@@ -167,18 +154,12 @@ pub struct SoundIoInStream {
     pub layout: SoundIoChannelLayout,
     pub software_latency: c_double,
     pub userdata: *mut c_void,
-    pub read_callback: Option<unsafe extern "C" fn(arg1:
-                                                                      *mut SoundIoInStream,
-                                                                  frame_count_min:
-                                                                      c_int,
-                                                                  frame_count_max:
-                                                                      c_int)>,
-    pub overflow_callback: Option<unsafe extern "C" fn(arg1:
-                                                                          *mut SoundIoInStream)>,
-    pub error_callback: Option<unsafe extern "C" fn(arg1:
-                                                                       *mut SoundIoInStream,
-                                                                   err:
-                                                                       c_int)>,
+    pub read_callback: Option<unsafe extern "C" fn(arg1: *mut SoundIoInStream,
+                                                   frame_count_min: c_int,
+                                                   frame_count_max: c_int)
+                                                  >,
+    pub overflow_callback: Option<unsafe extern "C" fn(arg1: *mut SoundIoInStream)>,
+    pub error_callback: Option<unsafe extern "C" fn(arg1: *mut SoundIoInStream, err: c_int)>,
     pub name: *const c_char,
     pub non_terminal_hint: u8,
     pub bytes_per_frame: c_int,
@@ -195,5 +176,3 @@ impl Default for SoundIoInStream {
         unsafe { mem::zeroed() }
     }
 }
-
-
