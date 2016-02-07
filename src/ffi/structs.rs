@@ -123,7 +123,7 @@ pub struct SoundIoOutStream {
     pub layout: SoundIoChannelLayout,
     pub software_latency: c_double,
     pub userdata: *mut c_void,
-    pub write_callback: Option<unsafe extern "C" fn(arg1: *mut SoundIoOutStream,
+    pub write_callback: Option<extern "C" fn(arg1: *mut SoundIoOutStream,
                                                     frame_count_min: c_int,
                                                     frame_count_max: c_int)
                                                    >,
