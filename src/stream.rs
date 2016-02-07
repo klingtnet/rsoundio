@@ -1,7 +1,16 @@
-use std::os::raw::{c_int, c_double};
+use std::os::raw::{c_int, c_double, c_void};
 
 use ffi;
 use base::*;
+
+extern "C" fn wrapper<T: Fn(OutStream, i32, i32)>(raw_out: *mut ffi::SoundIoOutStream,
+                                                  min: c_int,
+                                                  max: c_int) {
+    let out = OutStream::new(raw_out);
+    let cb_ptr = unsafe { (*out.stream).userdata as *const *const T };
+    let cb: &T = unsafe { &*(*cb_ptr) };
+    cb(out, min, max);
+}
 
 pub struct OutStream {
     // TODO: make this private again after
@@ -27,15 +36,11 @@ impl OutStream {
         }
     }
 
-    pub fn register_callback<F>(&self, callback: F)
-        where F: Fn(OutStream, i32, i32)
-    {
-        // TODO: set wrapper inside the constructor
-        unsafe extern "C" fn wrapper(out: *mut ffi::SoundIoOutStream, min: c_int, max: c_int) {
-            unimplemented!();
-        };
+    pub fn register_write_callback<T: Fn(OutStream, i32, i32)>(&mut self, callback: Box<T>) {
+        let userdata = &*callback as *const T as *mut c_void;
         unsafe {
-            (*self.stream).write_callback = Some(wrapper);
+            (*self.stream).userdata = userdata;
+            (*self.stream).write_callback = Some(wrapper::<T>);
         }
     }
 

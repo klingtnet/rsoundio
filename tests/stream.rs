@@ -13,11 +13,15 @@ fn test_outstream() {
     let dev_idx = sio.default_output_device_index().unwrap();
     let dev = sio.get_output_device(dev_idx).unwrap();
     println!("device: {}, ref_count: {}", dev, dev.ref_count());
-    let stream = dev.create_outstream().unwrap();
+    let mut stream = dev.create_outstream().unwrap();
     assert!(stream.open().is_none());
     let fmt = stream.current_format().unwrap();
     println!("current format: {}", fmt);
-    unsafe { (*stream.stream).write_callback = Some(write_callback) };
+    let cb = |out: rsoundio::OutStream, min: i32, max: i32| {
+        println!("Closure: {}, {}", min, max);
+    };
+    let boxed_cb = Box::new(cb);
+    stream.register_write_callback(boxed_cb);
     assert!(stream.start().is_none());
     loop {
         sio.wait_events();
