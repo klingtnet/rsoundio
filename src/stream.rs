@@ -13,8 +13,23 @@ extern "C" fn wrapper<T: Fn(OutStream, i32, i32)>(raw_out: *mut ffi::SoundIoOutS
 }
 
 pub struct OutStream {
-    // TODO: make this private again after
-    // implementint the callback register methods
+    // TODO: make this private again
+    // - add a struct that contains the registered callback closures, this could look like this:
+    // struct Callbacks<W: Fn(OutStream, i32, i32), U: Fn(OutStream), E: Fn(OutStream, SioError)> {
+    //      // maybe Option<Box<W>>
+    //      write_callback: Option<W>,
+    //      underflow_callback: Option<U>,
+    //      error_callback: Option<E>,
+    // }
+    // impl Default for Callbacks<W: Fn(OutStream, i32, i32), U: Fn(OutStream), E: Fn(OutStream, SioError)> {
+    //      fn default() -> Self {
+    //          Callbacks {
+    //              write_callback: None,
+    //              underflow_callback: None,
+    //              error_callback: None,
+    //          }
+    //      }
+    // }
     pub stream: *mut ffi::SoundIoOutStream,
 }
 impl OutStream {
