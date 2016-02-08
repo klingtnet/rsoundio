@@ -7,8 +7,8 @@ extern "C" fn wrapper<T: Fn(OutStream, i32, i32)>(raw_out: *mut ffi::SoundIoOutS
                                                   min: c_int,
                                                   max: c_int) {
     let out = OutStream::new(raw_out);
-    let cb_ptr = unsafe { (*out.stream).userdata as *const *const T };
-    let cb: &T = unsafe { &*(*cb_ptr) };
+    let cb_ptr = unsafe { (*out.stream).userdata as *const T };
+    let cb: &T = unsafe { &*cb_ptr };
     cb(out, min, max);
 }
 
