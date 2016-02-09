@@ -62,8 +62,7 @@ impl<'a> Drop for OutStreamCallbacks<'a> {
 }
 
 pub struct OutStream<'a> {
-    // TODO: make this private again
-    pub stream: *mut ffi::SoundIoOutStream,
+    stream: *mut ffi::SoundIoOutStream,
     callbacks: Box<OutStreamCallbacks<'a>>,
 }
 impl<'a> OutStream<'a> {
