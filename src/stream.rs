@@ -3,38 +3,60 @@ use std::os::raw::{c_int, c_double, c_void};
 use ffi;
 use base::*;
 
-extern "C" fn wrapper<T: Fn(OutStream, i32, i32)>(raw_out: *mut ffi::SoundIoOutStream,
-                                                  min: c_int,
-                                                  max: c_int) {
+extern "C" fn wrapper<W, U, E>(raw_out: *mut ffi::SoundIoOutStream, min: c_int, max: c_int)
+    where W: Fn(OutStream<W, U, E>, i32, i32),
+          U: Fn(OutStream<W, U, E>),
+          E: Fn(OutStream<W, U, E>, ffi::SioError)
+{
     let out = OutStream::new(raw_out);
-    let cb_ptr = unsafe { (*out.stream).userdata as *const T };
-    let cb: &T = unsafe { &*cb_ptr };
+    let cb_ptr = unsafe { (*out.stream).userdata as *const W };
+    let cb: &W = unsafe { &*cb_ptr };
     cb(out, min, max);
 }
 
-pub struct OutStream {
-    // TODO: make this private again
-    // - add a struct that contains the registered callback closures, this could look like this:
-    // struct Callbacks<W: Fn(OutStream, i32, i32), U: Fn(OutStream), E: Fn(OutStream, SioError)> {
-    //      // maybe Option<Box<W>>
-    //      write_callback: Option<W>,
-    //      underflow_callback: Option<U>,
-    //      error_callback: Option<E>,
-    // }
-    // impl Default for Callbacks<W: Fn(OutStream, i32, i32), U: Fn(OutStream), E: Fn(OutStream, SioError)> {
-    //      fn default() -> Self {
-    //          Callbacks {
-    //              write_callback: None,
-    //              underflow_callback: None,
-    //              error_callback: None,
-    //          }
-    //      }
-    // }
-    pub stream: *mut ffi::SoundIoOutStream,
+struct OutStreamCallbacks<W, U, E>
+    where W: Fn(OutStream<W, U, E>, i32, i32),
+          U: Fn(OutStream<W, U, E>),
+          E: Fn(OutStream<W, U, E>, ffi::SioError)
+{
+    write: Option<Box<W>>,
+    underflow: Option<Box<U>>,
+    error: Option<Box<E>>,
 }
-impl OutStream {
+impl<W, U, E> Default for OutStreamCallbacks<W, U, E>
+    where W: Fn(OutStream<W, U, E>, i32, i32),
+          U: Fn(OutStream<W, U, E>),
+          E: Fn(OutStream<W, U, E>, ffi::SioError)
+{
+    fn default() -> Self {
+        OutStreamCallbacks {
+            write: None,
+            underflow: None,
+            error: None,
+        }
+    }
+}
+
+
+pub struct OutStream<W, U, E>
+    where W: Fn(OutStream<W, U, E>, i32, i32),
+          U: Fn(OutStream<W, U, E>),
+          E: Fn(OutStream<W, U, E>, ffi::SioError)
+{
+    // TODO: make this private again
+    pub stream: *mut ffi::SoundIoOutStream,
+    callbacks: OutStreamCallbacks<W, U, E>,
+}
+impl<W, U, E> OutStream<W, U, E>
+    where W: Fn(OutStream<W, U, E>, i32, i32),
+          U: Fn(OutStream<W, U, E>),
+          E: Fn(OutStream<W, U, E>, ffi::SioError)
+{
     pub fn new(raw_stream: *mut ffi::SoundIoOutStream) -> Self {
-        OutStream { stream: raw_stream }
+        OutStream {
+            stream: raw_stream,
+            callbacks: OutStreamCallbacks::default(),
+        }
     }
 
     pub fn open(&self) -> Option<ffi::SioError> {
@@ -51,11 +73,11 @@ impl OutStream {
         }
     }
 
-    pub fn register_write_callback<T: Fn(OutStream, i32, i32)>(&mut self, callback: Box<T>) {
-        let userdata = &*callback as *const T as *mut c_void;
+    pub fn register_write_callback(&mut self, callback: Box<W>) {
+        let userdata = &*callback as *const W as *mut c_void;
         unsafe {
             (*self.stream).userdata = userdata;
-            (*self.stream).write_callback = Some(wrapper::<T>);
+            (*self.stream).write_callback = Some(wrapper::<W, U, E>);
         }
     }
 
@@ -130,7 +152,11 @@ impl OutStream {
         unsafe { ffi::soundio_outstream_destroy(self.stream) }
     }
 }
-impl Drop for OutStream {
+impl<W,U,E> Drop for OutStream<W, U, E>
+    where W: Fn(OutStream<W, U, E>, i32, i32),
+          U: Fn(OutStream<W, U, E>),
+          E: Fn(OutStream<W, U, E>, ffi::SioError)
+{
     fn drop(&mut self) {
         // TODO: call destroy manually.
         // OutStream will get dropped each time a new
