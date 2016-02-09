@@ -3,23 +3,30 @@ use std::os::raw::{c_int, c_double, c_void};
 use ffi;
 use base::*;
 
-extern "C" fn wrapper<W>(raw_out: *mut ffi::SoundIoOutStream, min: c_int, max: c_int)
-    where W: Fn(OutStream, i32, i32),
+extern "C" fn write_callback_wrapper<W>(raw_out: *mut ffi::SoundIoOutStream,
+                                        min: c_int,
+                                        max: c_int)
+    where W: Fn(OutStream, i32, i32)
 {
     let out = OutStream::new(raw_out);
-    let cb_ptr = unsafe { (*out.stream).userdata as *const Box<W> };
-    let cb: &W = unsafe { &*cb_ptr };
-    cb(out, min, max);
+    let callbacks_ptr = unsafe { (*out.stream).userdata as *const Box<OutStreamCallbacks> };
+    let callbacks: &Box<OutStreamCallbacks> = unsafe { &*callbacks_ptr };
+    println!("match");
+    match callbacks.write {
+        Some(ref f) => f(out, min as i32, max as i32),
+        None => println!("No registered callback found!"),
+    }
+    // let cb_ptr = unsafe { (*out.stream).userdata as *const Box<W> };
+    // let cb: &W = unsafe { &*cb_ptr };
+    // cb(out, min, max);
 }
 
-struct OutStreamCallbacks
-{
-    write: Option<Box<Fn(OutStream, i32, i32)>>,
-    underflow: Option<Box<Fn(OutStream)>>,
-    error: Option<Box<Fn(OutStream, ffi::SioError)>>,
+struct OutStreamCallbacks<'a> {
+    write: Option<Box<Fn(OutStream, i32, i32) + 'a>>,
+    underflow: Option<Box<Fn(OutStream) + 'a>>,
+    error: Option<Box<Fn(OutStream, ffi::SioError) + 'a>>,
 }
-impl Default for OutStreamCallbacks
-{
+impl<'a> Default for OutStreamCallbacks<'a> {
     fn default() -> Self {
         OutStreamCallbacks {
             write: None,
@@ -28,19 +35,22 @@ impl Default for OutStreamCallbacks
         }
     }
 }
+impl<'a> Drop for OutStreamCallbacks<'a> {
+    fn drop(&mut self) {
+    }
+}
 
-pub struct OutStream
-{
+pub struct OutStream<'a> {
     // TODO: make this private again
     pub stream: *mut ffi::SoundIoOutStream,
-    callbacks: OutStreamCallbacks,
+    callbacks: Box<OutStreamCallbacks<'a>>,
 }
-impl OutStream
-{
+impl<'a> OutStream<'a> {
     pub fn new(raw_stream: *mut ffi::SoundIoOutStream) -> Self {
+        let callbacks = Box::new(OutStreamCallbacks::default());
         OutStream {
             stream: raw_stream,
-            callbacks: OutStreamCallbacks::default(),
+            callbacks: callbacks,
         }
     }
 
@@ -59,13 +69,29 @@ impl OutStream
     }
 
     pub fn register_write_callback<W>(&mut self, callback: Box<W>)
-        where W: Fn(OutStream, i32, i32)
+        where W: Fn(OutStream, i32, i32) + 'a
     {
-        let userdata = &*callback as *const W as *mut c_void;
+        // stored box reference to callback closure
+        self.callbacks.write = Some(callback);
         unsafe {
-            (*self.stream).userdata = userdata;
-            (*self.stream).write_callback = Some(wrapper::<W>);
+            // register wrapper for write_callback
+            (*self.stream).write_callback = Some(write_callback_wrapper::<W>);
+            // store reference to callbacks struct in userdata pointer
+            (*self.stream).userdata =
+                &self.callbacks as *const Box<OutStreamCallbacks> as *mut c_void
         }
+    }
+
+    pub fn register_underflow_callback<U>(&mut self, callback: Box<U>)
+        where U: Fn(OutStream) + 'a
+    {
+        self.callbacks.underflow = Some(callback)
+    }
+
+    pub fn register_error_callback<E>(&mut self, callback: Box<E>)
+        where E: Fn(OutStream, ffi::SioError) + 'a
+    {
+        self.callbacks.error = Some(callback)
     }
 
     pub fn begin_write(&self,
@@ -139,8 +165,7 @@ impl OutStream
         unsafe { ffi::soundio_outstream_destroy(self.stream) }
     }
 }
-impl Drop for OutStream
-{
+impl<'a> Drop for OutStream<'a> {
     fn drop(&mut self) {
         // TODO: call destroy manually.
         // OutStream will get dropped each time a new
