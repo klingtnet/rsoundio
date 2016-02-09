@@ -10,14 +10,26 @@ fn test_outstream() {
     // assert!(sio.connect_backend(rsoundio::ffi::SioBackend::Alsa).is_none());
     println!("current backend: {}", sio.current_backend().unwrap());
     sio.flush_events();
+    let mut fmt;
     let dev_idx = sio.default_output_device_index().unwrap();
     let dev = sio.get_output_device(dev_idx).unwrap();
     println!("device: {}, ref_count: {}", dev, dev.ref_count());
-    let stream = dev.create_outstream().unwrap();
+    let mut stream = dev.create_outstream().unwrap();
     assert!(stream.open().is_none());
-    let fmt = stream.current_format().unwrap();
+    fmt = stream.current_format().unwrap();
     println!("current format: {}", fmt);
-    unsafe { (*stream.stream).write_callback = Some(write_callback) };
+    let cb = |out: rsoundio::OutStream, min: i32, max: i32| {
+        println!("Closure: {}, {} using format: {}", min, max, fmt);
+    };
+    stream.register_write_callback(Box::new(cb));
+    let ucb = | out: rsoundio::OutStream | {
+        println!("Underflow!")
+    };
+    stream.register_underflow_callback(Box::new(ucb));
+    let ecb = | out: rsoundio::OutStream, err: rsoundio::ffi::SioError| {
+        println!("Error: {}", err)
+    };
+    stream.register_error_callback(Box::new(ecb));
     assert!(stream.start().is_none());
     loop {
         sio.wait_events();
