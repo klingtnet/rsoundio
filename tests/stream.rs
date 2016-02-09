@@ -21,8 +21,7 @@ fn test_outstream() {
     let cb = |out: rsoundio::OutStream, min: i32, max: i32| {
         println!("Closure: {}, {} using format: {}", min, max, fmt);
     };
-    let boxed_cb = Box::new(cb);
-    stream.register_write_callback(boxed_cb);
+    stream.register_write_callback(Box::new(cb));
     let ucb = | out: rsoundio::OutStream | {
         println!("Underflow!")
     };
