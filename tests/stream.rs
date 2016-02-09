@@ -22,6 +22,14 @@ fn test_outstream() {
     };
     let boxed_cb = Box::new(cb);
     stream.register_write_callback(boxed_cb);
+    let ucb = | out: rsoundio::OutStream | {
+        println!("Underflow!")
+    };
+    stream.register_underflow_callback(Box::new(ucb));
+    let ecb = | out: rsoundio::OutStream, err: rsoundio::ffi::SioError| {
+        println!("Error: {}", err)
+    };
+    stream.register_error_callback(Box::new(ecb));
     assert!(stream.start().is_none());
     loop {
         sio.wait_events();
