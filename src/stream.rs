@@ -11,14 +11,10 @@ extern "C" fn write_callback_wrapper<W>(raw_out: *mut ffi::SoundIoOutStream,
     let out = OutStream::new(raw_out);
     let callbacks_ptr = unsafe { (*out.stream).userdata as *const Box<OutStreamCallbacks> };
     let callbacks: &Box<OutStreamCallbacks> = unsafe { &*callbacks_ptr };
-    println!("match");
     match callbacks.write {
         Some(ref f) => f(out, min as i32, max as i32),
         None => println!("No registered callback found!"),
     }
-    // let cb_ptr = unsafe { (*out.stream).userdata as *const Box<W> };
-    // let cb: &W = unsafe { &*cb_ptr };
-    // cb(out, min, max);
 }
 
 struct OutStreamCallbacks<'a> {
