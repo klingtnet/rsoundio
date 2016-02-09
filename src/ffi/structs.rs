@@ -127,8 +127,8 @@ pub struct SoundIoOutStream {
                                                     frame_count_min: c_int,
                                                     frame_count_max: c_int)
                                                    >,
-    pub underflow_callback: Option<unsafe extern "C" fn(arg1: *mut SoundIoOutStream)>,
-    pub error_callback: Option<unsafe extern "C" fn(arg1: *mut SoundIoOutStream, err: c_int)>,
+    pub underflow_callback: Option<extern "C" fn(arg1: *mut SoundIoOutStream)>,
+    pub error_callback: Option<extern "C" fn(arg1: *mut SoundIoOutStream, err: SioError)>,
     pub name: *const c_char,
     pub non_terminal_hint: u8,
     pub bytes_per_frame: c_int,
