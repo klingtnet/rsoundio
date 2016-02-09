@@ -11,10 +11,7 @@ extern "C" fn write_callback_wrapper<W>(raw_out: *mut ffi::SoundIoOutStream,
     let out = OutStream::new(raw_out);
     let callbacks_ptr = unsafe { (*out.stream).userdata as *const Box<OutStreamCallbacks> };
     let callbacks: &Box<OutStreamCallbacks> = unsafe { &*callbacks_ptr };
-    match callbacks.write {
-        Some(ref f) => f(out, min as i32, max as i32),
-        None => println!("No registered callback found!"),
-    }
+    callbacks.write.as_ref().map(|ref f| f(out, min as i32, max as i32));
 }
 
 extern "C" fn underflow_callback_wrapper<U>(raw_out: *mut ffi::SoundIoOutStream)
@@ -23,11 +20,7 @@ extern "C" fn underflow_callback_wrapper<U>(raw_out: *mut ffi::SoundIoOutStream)
     let out = OutStream::new(raw_out);
     let callbacks_ptr = unsafe { (*out.stream).userdata as *const Box<OutStreamCallbacks> };
     let callbacks: &Box<OutStreamCallbacks> = unsafe { &*callbacks_ptr };
-    println!("match");
-    match callbacks.underflow {
-        Some(ref f) => f(out),
-        None => println!("No registered callback found!"),
-    }
+    callbacks.underflow.as_ref().map(|ref f| f(out));
 }
 
 extern "C" fn error_callback_wrapper<E>(raw_out: *mut ffi::SoundIoOutStream, error: ffi::SioError)
@@ -36,11 +29,7 @@ extern "C" fn error_callback_wrapper<E>(raw_out: *mut ffi::SoundIoOutStream, err
     let out = OutStream::new(raw_out);
     let callbacks_ptr = unsafe { (*out.stream).userdata as *const Box<OutStreamCallbacks> };
     let callbacks: &Box<OutStreamCallbacks> = unsafe { &*callbacks_ptr };
-    println!("match");
-    match callbacks.error {
-        Some(ref f) => f(out, error),
-        None => println!("No registered callback found!"),
-    }
+    callbacks.error.as_ref().map(|ref f| f(out, error));
 }
 
 struct OutStreamCallbacks<'a> {
