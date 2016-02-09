@@ -58,8 +58,7 @@ impl<'a> Default for OutStreamCallbacks<'a> {
     }
 }
 impl<'a> Drop for OutStreamCallbacks<'a> {
-    fn drop(&mut self) {
-    }
+    fn drop(&mut self) {}
 }
 
 pub struct OutStream<'a> {

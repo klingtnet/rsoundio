@@ -272,8 +272,7 @@ impl Device {
         unsafe { ffi::soundio_device_nearest_sample_rate(self.device, sample_rate) as i32 }
     }
 
-    pub fn create_outstream(&self) -> Option<OutStream>
-    {
+    pub fn create_outstream(&self) -> Option<OutStream> {
         let stream_ptr = unsafe { ffi::soundio_outstream_create(self.device) };
         if stream_ptr.is_null() {
             None
