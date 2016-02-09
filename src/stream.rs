@@ -107,13 +107,27 @@ impl<'a> OutStream<'a> {
     pub fn register_underflow_callback<U>(&mut self, callback: Box<U>)
         where U: Fn(OutStream) + 'a
     {
-        self.callbacks.underflow = Some(callback)
+        self.callbacks.underflow = Some(callback);
+        unsafe {
+            // register wrapper for write_callback
+            (*self.stream).underflow_callback = Some(underflow_callback_wrapper::<U>);
+            // store reference to callbacks struct in userdata pointer
+            (*self.stream).userdata =
+                &self.callbacks as *const Box<OutStreamCallbacks> as *mut c_void
+        }
     }
 
     pub fn register_error_callback<E>(&mut self, callback: Box<E>)
         where E: Fn(OutStream, ffi::SioError) + 'a
     {
-        self.callbacks.error = Some(callback)
+        self.callbacks.error = Some(callback);
+        unsafe {
+            // register wrapper for write_callback
+            (*self.stream).error_callback = Some(error_callback_wrapper::<E>);
+            // store reference to callbacks struct in userdata pointer
+            (*self.stream).userdata =
+                &self.callbacks as *const Box<OutStreamCallbacks> as *mut c_void
+        }
     }
 
     pub fn begin_write(&self,
