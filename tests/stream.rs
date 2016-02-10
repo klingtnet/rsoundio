@@ -64,7 +64,7 @@ unsafe extern "C" fn write_callback(raw_out: *mut rsoundio::ffi::SoundIoOutStrea
             break;
         }
 
-        let areas = unsafe { ::std::slice::from_raw_parts_mut(raw_areas, channels as usize) };
+        let areas = ::std::slice::from_raw_parts_mut(raw_areas, channels as usize);
         let mut dir = 1.0;
         for idx in 0..block_size {
             if f >= 8_000.0 || f <= 60.0 {
@@ -78,7 +78,7 @@ unsafe extern "C" fn write_callback(raw_out: *mut rsoundio::ffi::SoundIoOutStrea
                 let addr = (areas[ch_idx as usize].ptr as usize +
                             areas[ch_idx as usize].step as usize *
                             idx as usize) as *mut f32;
-                unsafe { *addr = sample };
+                *addr = sample ;
             }
         }
         assert!(out.end_write().is_none());
