@@ -10,7 +10,7 @@ fn test_outstream() {
     // assert!(sio.connect_backend(rsoundio::ffi::SioBackend::Alsa).is_none());
     println!("current backend: {}", sio.current_backend().unwrap());
     sio.flush_events();
-    let mut fmt;
+    let fmt;
     let dev_idx = sio.default_output_device_index().unwrap();
     let dev = sio.get_output_device(dev_idx).unwrap();
     println!("device: {}, ref_count: {}", dev, dev.ref_count());
