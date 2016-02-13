@@ -1,4 +1,5 @@
 use std::os::raw::{c_int, c_double, c_void};
+use std::ptr;
 
 use ffi;
 use base::*;
@@ -113,6 +114,35 @@ impl<'a> OutStream<'a> {
             (*self.stream).userdata =
                 &self.callbacks as *const Box<OutStreamCallbacks> as *mut c_void
         }
+    }
+
+    pub fn write_stream(&self,
+                        min_frame_count: i32,
+                        buffers: &Vec<Vec<f32>>)
+                        -> Result<i32, ffi::SioError> {
+        let channel_count = self.get_layout().channel_count();
+        // check if buffer contains frames for all channels
+        if buffers.len() < channel_count as usize {
+            return Err(ffi::SioError::Invalid);
+        }
+        // check if there are at least min_frame_count frames for all channels
+        if !buffers.iter().map(|c| c.len()).all(|l| l >= min_frame_count as usize) {
+            return Err(ffi::SioError::Invalid);
+        }
+
+        // assuming that every channel buffer has the same length
+        let mut frame_count = buffers[0].len() as c_int;
+        let mut raw_areas: *mut ffi::SoundIoChannelArea = ptr::null_mut();
+        let actual_frame_count = try!(self.begin_write(&mut raw_areas, &frame_count));
+        let areas = unsafe { ::std::slice::from_raw_parts_mut(raw_areas, channel_count as usize) };
+        for idx in 0..actual_frame_count as usize {
+            for channel in 0..channel_count as usize {
+                let area = areas[channel];
+                let addr = (area.ptr as usize + area.step as usize * idx) as *mut f32;
+                unsafe { *addr = buffers[channel][idx] }
+            }
+        }
+        self.end_write().map_or(Ok(actual_frame_count), |err| Err(err))
     }
 
     pub fn begin_write(&self,
