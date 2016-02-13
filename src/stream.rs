@@ -147,11 +147,16 @@ impl<'a> OutStream<'a> {
 
     pub fn begin_write(&self,
                        areas: *mut *mut ffi::SoundIoChannelArea,
-                       frame_count: *mut c_int)
-                       -> Option<ffi::SioError> {
-        match unsafe { ffi::soundio_outstream_begin_write(self.stream, areas, frame_count) } {
-            ffi::SioError::None => None,
-            err @ _ => Some(err),
+                       frame_count: &i32)
+                       -> Result<i32, ffi::SioError> {
+        let mut actual_frame_count = *frame_count as c_int;
+        match unsafe {
+            ffi::soundio_outstream_begin_write(self.stream,
+                                               areas,
+                                               &mut actual_frame_count as *mut c_int)
+        } {
+            ffi::SioError::None => Ok(actual_frame_count),
+            err @ _ => Err(err),
         }
     }
 
