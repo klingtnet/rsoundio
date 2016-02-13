@@ -145,7 +145,7 @@ impl<'a> OutStream<'a> {
         self.end_write().map_or(Ok(actual_frame_count), |err| Err(err))
     }
 
-    pub fn begin_write(&self,
+    fn begin_write(&self,
                        areas: *mut *mut ffi::SoundIoChannelArea,
                        frame_count: &i32)
                        -> Result<i32, ffi::SioError> {
@@ -160,7 +160,7 @@ impl<'a> OutStream<'a> {
         }
     }
 
-    pub fn end_write(&self) -> Option<ffi::SioError> {
+    fn end_write(&self) -> Option<ffi::SioError> {
         match unsafe { ffi::soundio_outstream_end_write(self.stream) } {
             ffi::SioError::None => None,
             err @ _ => Some(err),
