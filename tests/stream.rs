@@ -30,7 +30,9 @@ fn test_outstream() {
     let r = l.clone();
     frames = vec![l, r];
     let cb = |out: rsoundio::OutStream, min_frame_count: i32, max_frame_count: i32| {
-        out.write_stream_f32(min_frame_count, &frames).unwrap();
+        let frames_written = out.write_stream_f32(min_frame_count, &frames).unwrap();
+        assert!(frames_written > 0);
+        out.get_latency().map(|latency| assert!(latency >= 0.0));
     };
     stream.register_write_callback(Box::new(cb));
     let ucb = |out: rsoundio::OutStream| println!("Underflow!");
