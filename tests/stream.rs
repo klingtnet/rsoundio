@@ -40,11 +40,12 @@ fn test_outstream() {
     let ecb = |out: rsoundio::OutStream, err: rsoundio::ffi::SioError| println!("Error: {}", err);
     stream.register_error_callback(Box::new(ecb));
     assert!(stream.start().is_none());
-    sio.wait_events();
-    println!("Received event!");
-    assert!(stream.clear_buffer().is_none());
+    //sio.wait_events();
+    thread::sleep(Duration::new(1,0));
     assert!(stream.pause(true).is_none());
+    thread::sleep(Duration::new(1,0));
     assert!(stream.pause(false).is_none());
-    println!("latency: {}", stream.get_latency().unwrap());
+    assert!(stream.clear_buffer().is_none());
+    thread::sleep(Duration::new(1,0));
     stream.destroy();
 }
