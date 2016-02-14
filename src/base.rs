@@ -4,6 +4,8 @@ use std::os::raw::c_int;
 use ffi;
 use stream::OutStream;
 
+pub type SioResult<T> = Result<T, ffi::SioError>;
+
 pub struct SoundIo {
     context: *mut ffi::SoundIo,
 }

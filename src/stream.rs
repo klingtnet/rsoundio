@@ -6,7 +6,7 @@ use base::*;
 
 macro_rules! write_stream {
     ($name:ident, $t:ty) => (
-        pub fn $name(&self,min_frame_count: i32,buffers: &Vec<Vec<$t>>) -> Result<i32, ffi::SioError> {
+        pub fn $name(&self,min_frame_count: i32,buffers: &Vec<Vec<$t>>) -> SioResult<i32> {
             let channel_count = self.get_layout().channel_count();
             // check if buffer contains frames for all channels
             if buffers.len() < channel_count as usize {
@@ -158,7 +158,7 @@ impl<'a> OutStream<'a> {
     fn begin_write(&self,
                    areas: *mut *mut ffi::SoundIoChannelArea,
                    frame_count: &i32)
-                   -> Result<i32, ffi::SioError> {
+                   -> SioResult<i32> {
         let mut actual_frame_count = *frame_count as c_int;
         match unsafe {
             ffi::soundio_outstream_begin_write(self.stream,
@@ -195,7 +195,7 @@ impl<'a> OutStream<'a> {
         }
     }
 
-    pub fn get_latency(&self) -> Result<f64, ffi::SioError> {
+    pub fn get_latency(&self) -> SioResult<f64> {
         let mut latency = 0.0f64;
         match unsafe {
             ffi::soundio_outstream_get_latency(self.stream, &mut latency as *mut c_double)
@@ -206,7 +206,7 @@ impl<'a> OutStream<'a> {
 
     }
 
-    pub fn current_format(&self) -> Result<ffi::SioFormat, ffi::SioError> {
+    pub fn current_format(&self) -> SioResult<ffi::SioFormat> {
         match unsafe { (*self.stream).format } {
             ffi::SioFormat::Invalid => Err(ffi::SioError::Invalid),
             fmt @ _ => Ok(fmt),
