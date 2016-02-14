@@ -2,13 +2,14 @@ extern crate rsoundio;
 
 use std::os::raw::c_int;
 use std::f32::consts;
+use std::thread;
+use std::time::Duration;
 
 #[test]
 fn test_outstream() {
     println!("test: OutStream");
     let sio = rsoundio::SoundIo::new();
-    assert!(sio.connect().is_none());
-    // assert!(sio.connect_backend(rsoundio::ffi::SioBackend::Alsa).is_none());
+    assert!(sio.connect_backend(rsoundio::ffi::SioBackend::Dummy).is_none());
     println!("current backend: {}", sio.current_backend().unwrap());
     sio.flush_events();
     let fmt;
