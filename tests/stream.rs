@@ -21,7 +21,7 @@ fn test_outstream() {
     assert!(stream.open().is_none());
     fmt = stream.current_format().unwrap();
     println!("current format: {}", fmt);
-    let f = 440f32;
+    let f = 4400f32;
     let sr = stream.get_sample_rate();
     let layout = stream.get_layout();
     let channels = layout.channel_count();
