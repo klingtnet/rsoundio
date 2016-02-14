@@ -26,7 +26,7 @@ fn test_outstream() {
     let layout = stream.get_layout();
     let channels = layout.channel_count();
     let phi = 2.0 * f * consts::PI / (sr as f32);
-    let l: Vec<f32> = (0..4800).map(|i| f32::sin(i as f32 * phi)).collect();
+    let l: Vec<f32> = (0..4096).map(|i| f32::sin(i as f32 * phi)).collect();
     let r = l.clone();
     frames = vec![l, r];
     let cb = |out: rsoundio::OutStream, min_frame_count: i32, max_frame_count: i32| {
