@@ -7,3 +7,4 @@ This is a work in progress.
 - [ ] add documentation
 - [ ] implement `InStream`
 - [ ] publish on crates.io
+- [ ] write examples
