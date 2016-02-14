@@ -1,8 +1,38 @@
 use std::os::raw::{c_int, c_double, c_void};
-use std::ptr;
+use std::{ptr, slice};
 
 use ffi;
 use base::*;
+
+macro_rules! write_stream {
+    ($name:ident, $t:ty) => (
+        pub fn $name(&self,min_frame_count: i32,buffers: &Vec<Vec<$t>>) -> Result<i32, ffi::SioError> {
+            let channel_count = self.get_layout().channel_count();
+            // check if buffer contains frames for all channels
+            if buffers.len() < channel_count as usize {
+                return Err(ffi::SioError::Invalid);
+            }
+            // check if there are at least min_frame_count frames for all channels
+            if !buffers.iter().map(|c| c.len()).all(|l| l >= min_frame_count as usize) {
+                return Err(ffi::SioError::Invalid);
+            }
+
+            // assuming that every channel buffer has the same length
+            let mut frame_count = buffers[0].len() as c_int;
+            let mut raw_areas: *mut ffi::SoundIoChannelArea = ptr::null_mut();
+            let actual_frame_count = try!(self.begin_write(&mut raw_areas, &frame_count));
+            let areas = unsafe { slice::from_raw_parts_mut(raw_areas, channel_count as usize) };
+            for idx in 0..actual_frame_count as usize {
+                for channel in 0..channel_count as usize {
+                    let area = areas[channel];
+                    let addr = (area.ptr as usize + area.step as usize * idx) as *mut $t;
+                    unsafe { *addr = buffers[channel][idx] }
+                }
+            }
+            self.end_write().map_or(Ok(actual_frame_count), |err| Err(err))
+        }
+    )
+}
 
 extern "C" fn write_wrapper<W>(raw_out: *mut ffi::SoundIoOutStream, min: c_int, max: c_int)
     where W: Fn(OutStream, i32, i32)
@@ -116,34 +146,14 @@ impl<'a> OutStream<'a> {
         }
     }
 
-    pub fn write_stream(&self,
-                        min_frame_count: i32,
-                        buffers: &Vec<Vec<f32>>)
-                        -> Result<i32, ffi::SioError> {
-        let channel_count = self.get_layout().channel_count();
-        // check if buffer contains frames for all channels
-        if buffers.len() < channel_count as usize {
-            return Err(ffi::SioError::Invalid);
-        }
-        // check if there are at least min_frame_count frames for all channels
-        if !buffers.iter().map(|c| c.len()).all(|l| l >= min_frame_count as usize) {
-            return Err(ffi::SioError::Invalid);
-        }
-
-        // assuming that every channel buffer has the same length
-        let mut frame_count = buffers[0].len() as c_int;
-        let mut raw_areas: *mut ffi::SoundIoChannelArea = ptr::null_mut();
-        let actual_frame_count = try!(self.begin_write(&mut raw_areas, &frame_count));
-        let areas = unsafe { ::std::slice::from_raw_parts_mut(raw_areas, channel_count as usize) };
-        for idx in 0..actual_frame_count as usize {
-            for channel in 0..channel_count as usize {
-                let area = areas[channel];
-                let addr = (area.ptr as usize + area.step as usize * idx) as *mut f32;
-                unsafe { *addr = buffers[channel][idx] }
-            }
-        }
-        self.end_write().map_or(Ok(actual_frame_count), |err| Err(err))
-    }
+    write_stream!(write_stream_i8, i8);
+    write_stream!(write_stream_u8, u8);
+    write_stream!(write_stream_i16, i16);
+    write_stream!(write_stream_u16, u16);
+    write_stream!(write_stream_i32, i32);
+    write_stream!(write_stream_u32, u32);
+    write_stream!(write_stream_f32, f32);
+    write_stream!(write_stream_f64, f64);
 
     fn begin_write(&self,
                        areas: *mut *mut ffi::SoundIoChannelArea,
