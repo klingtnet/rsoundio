@@ -48,4 +48,5 @@ fn test_outstream() {
     assert!(stream.clear_buffer().is_none());
     thread::sleep(Duration::new(1,0));
     stream.destroy();
+    dev.dec_ref();
 }
