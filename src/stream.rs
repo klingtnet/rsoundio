@@ -156,9 +156,9 @@ impl<'a> OutStream<'a> {
     write_stream!(write_stream_f64, f64);
 
     fn begin_write(&self,
-                       areas: *mut *mut ffi::SoundIoChannelArea,
-                       frame_count: &i32)
-                       -> Result<i32, ffi::SioError> {
+                   areas: *mut *mut ffi::SoundIoChannelArea,
+                   frame_count: &i32)
+                   -> Result<i32, ffi::SioError> {
         let mut actual_frame_count = *frame_count as c_int;
         match unsafe {
             ffi::soundio_outstream_begin_write(self.stream,
