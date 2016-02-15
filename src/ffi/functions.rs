@@ -90,18 +90,4 @@ extern "C" {
     pub fn soundio_instream_get_latency(instream: *mut SoundIoInStream,
                                         out_latency: *mut c_double)
                                         -> c_int;
-    pub fn soundio_ring_buffer_create(soundio: *mut SoundIo,
-                                      requested_capacity: c_int)
-                                      -> *mut SoundIoRingBuffer;
-    pub fn soundio_ring_buffer_destroy(ring_buffer: *mut SoundIoRingBuffer);
-    pub fn soundio_ring_buffer_capacity(ring_buffer: *mut SoundIoRingBuffer) -> c_int;
-    pub fn soundio_ring_buffer_write_ptr(ring_buffer: *mut SoundIoRingBuffer) -> *mut c_char;
-    pub fn soundio_ring_buffer_advance_write_ptr(ring_buffer: *mut SoundIoRingBuffer,
-                                                 count: c_int);
-    pub fn soundio_ring_buffer_read_ptr(ring_buffer: *mut SoundIoRingBuffer) -> *mut c_char;
-    pub fn soundio_ring_buffer_advance_read_ptr(ring_buffer: *mut SoundIoRingBuffer,
-                                                count: c_int);
-    pub fn soundio_ring_buffer_fill_count(ring_buffer: *mut SoundIoRingBuffer) -> c_int;
-    pub fn soundio_ring_buffer_free_count(ring_buffer: *mut SoundIoRingBuffer) -> c_int;
-    pub fn soundio_ring_buffer_clear(ring_buffer: *mut SoundIoRingBuffer);
 }

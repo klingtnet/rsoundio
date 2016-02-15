@@ -11,25 +11,53 @@ pub fn ptr_to_string(str_ptr: *const c_char) -> Result<String, Utf8Error> {
     Ok(str_slice.to_string())
 }
 
+/// Possible error codes. You can print the
+/// corresponding error message easily, because
+/// this enum implements `Display`.
+///
+/// # Example
+///
+/// ```
+/// use rsoundio::ffi::SioError;
+/// println!("{}", SioError::SystemResources)
+/// ```
 #[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(u32)]
 pub enum SioError {
     None = 0,
+    /// Out of memory.
     NoMem = 1,
+    /// The backend does not appear to be active or running.
     InitAudioBackend = 2,
+    /// A system resource other than memory (Dummy) was not available.
     SystemResources = 3,
+    /// Attempted to open a device and failed.
     OpeningDevice = 4,
     NoSuchDevice = 5,
+    /// The programmer did not comply with the API.
     Invalid = 6,
+    /// libsoundio was compiled without support for that backend.
+    ///
+    /// Currently there is no JACK support in Arch Linux until
+    /// `jack2{,-dbus}1.9.10-4` is available. See [this](https://bugs.archlinux.org/task/47839)
+    /// bug report for details.
     BackendUnavailable = 7,
+    /// An open stream had an error that can only be recovered from by
+    /// destroying the stream and creating it again.
     Streaming = 8,
+    /// Attempted to use a device with parameters it cannot support.
     IncompatibleDevice = 9,
+    /// When JACK returns `JackNoSuchClient`
     NoSuchClient = 10,
+    /// Attempted to use parameters that the backend cannot support.
     IncompatibleBackend = 11,
+    /// Backend server shutdown or became inactive.
     BackendDisconnected = 12,
     Interrupted = 13,
+    /// Buffer underrun occurred.
     Underflow = 14,
+    /// Unable to convert to or from UTF-8 to the native string format.
     EncodingString = 15,
 }
 impl Display for SioError {
@@ -222,5 +250,5 @@ impl SioFormat {
     }
 }
 
-#[allow(dead_code,non_camel_case_types)]
-pub enum SoundIoRingBuffer { }
+//#[allow(dead_code,non_camel_case_types)]
+//enum SoundIoRingBuffer { }
