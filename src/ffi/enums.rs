@@ -67,11 +67,13 @@ impl Display for SioError {
     }
 }
 
+/// Specifies where a channel is physically located.
 #[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy, PartialEq, Debug)]
 #[repr(u32)]
 pub enum SioChannelId {
     Invalid = 0,
+    /// First of the more commonly supported ids.
     FrontLeft = 1,
     FrontRight = 2,
     FrontCenter = 3,
@@ -89,7 +91,9 @@ pub enum SioChannelId {
     TopFrontRight = 15,
     TopBackLeft = 16,
     TopBackCenter = 17,
+    /// Last of the more commonly supported ids.
     TopBackRight = 18,
+    /// First of the less commonly supported ids.
     BackLeftCenter = 19,
     BackRightCenter = 20,
     FrontLeftWide = 21,
@@ -107,14 +111,18 @@ pub enum SioChannelId {
     BottomCenter = 33,
     BottomLeftCenter = 34,
     BottomRightCenter = 35,
+    /// Mid/side recording
     MsMid = 36,
     MsSide = 37,
+    /// first order ambisonic channels
     AmbisonicW = 38,
     AmbisonicX = 39,
     AmbisonicY = 40,
     AmbisonicZ = 41,
+    /// X-Y Recording
     XyX = 42,
     XyY = 43,
+    /// First of the "other" channel ids
     HeadphonesLeft = 44,
     HeadphonesRight = 45,
     ClickTrack = 46,
@@ -122,6 +130,7 @@ pub enum SioChannelId {
     HearingImpaired = 48,
     Narration = 49,
     Haptic = 50,
+    /// Last of the "other" channel ids
     DialogCentricMix = 51,
     Aux = 52,
     Aux0 = 53,
@@ -155,6 +164,7 @@ impl From<String> for SioChannelId {
     }
 }
 
+/// Built-in channel layouts for convenience.
 #[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy)]
 #[repr(u32)]
@@ -210,32 +220,60 @@ impl Display for SioBackend {
 #[derive(Clone, Copy)]
 #[repr(u32)]
 pub enum SioDeviceAim {
+    /// capture/recording
     Input = 0,
+    /// playback
     Output = 1,
 }
 
+/// Supported sound formats, each for little- and big-endian.
 #[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy)]
 #[repr(u32)]
 pub enum SioFormat {
     Invalid = 0,
+    /// Signed 8 bit
     S8 = 1,
+    /// Unsigned 8 bit
     U8 = 2,
+    /// Signed 16 bit little-endian
     S16LE = 3,
+    /// Signed 16 bit big-endian
     S16BE = 4,
+    /// Unsigned 16 bit little-endian
     U16LE = 5,
+    /// Unsigned 16 bit big-endian
     U16BE = 6,
+    /// The 24 bit types are not supported in rsoundio at the moment.
+    /// Because there is no native number type that is 24 bits wide,
+    /// (at least not in Rusts `std`) I had to use something like
+    /// C unions in Rust to support them.
+    /// This would probably be unsafe and working with
+    /// 3 byte number types is also not too much fun.
+    ///
+    /// Signed 24 bit little-endian
     S24LE = 7,
+    /// Signed 24 bit big-endian
     S24BE = 8,
+    /// Unsigned 24 bit little-endian
     U24LE = 9,
+    /// Unsigned 24 bit big-endian
     U24BE = 10,
+    /// Signed 32 bit little-endian
     S32LE = 11,
+    /// Signed 32 bit big-endian
     S32BE = 12,
+    /// Unsigned 32 bit little-endian
     U32LE = 13,
+    /// Unsigend 32 bit big-endian
     U32BE = 14,
+    /// 32 bit float little-endian in [-1.0, 1.0]
     Float32LE = 15,
+    /// 32 bit float big-endian in [-1.0, 1.0]
     Float32BE = 16,
+    /// 64 bit float little-endian in [-1.0, 1.0]
     Float64LE = 17,
+    /// 64 bit float big-endian in [-1.0, 1.0]
     Float64BE = 18,
 }
 impl Display for SioFormat {
@@ -245,6 +283,7 @@ impl Display for SioFormat {
     }
 }
 impl SioFormat {
+    /// Returns the number of bytes a sample takes in this format.
     pub fn get_bytes_per_sample(self) -> i32 {
         unsafe { soundio_get_bytes_per_sample(self) as i32 }
     }
