@@ -329,6 +329,21 @@ impl<'a> OutStream<'a> {
         }
     }
 
+    /// Sets the stream format to `format`.
+    /// **Must** be called before `open`ing the stream.
+    ///
+    /// If the device doesn't support the format
+    /// `ffi::SioError::IncompatibleDevice` is returned.
+    pub fn set_format(&self, format: ffi::SioFormat) -> SioResult<()> {
+        let dev = self.get_device();
+        if dev.supports_format(format) {
+            unsafe { (*self.stream).format = format };
+            Ok(())
+        } else {
+            Err(ffi::SioError::IncompatibleDevice)
+        }
+    }
+
     /// Returns the channel layout of the output stream.
     pub fn get_layout(&self) -> ChannelLayout {
         ChannelLayout::new(unsafe { &(*self.stream).layout })
