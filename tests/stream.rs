@@ -1,6 +1,5 @@
 extern crate rsoundio;
 
-use std::os::raw::c_int;
 use std::f32::consts;
 use std::thread;
 use std::time::Duration;
