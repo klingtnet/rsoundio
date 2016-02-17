@@ -251,6 +251,12 @@ impl SoundIo {
         unsafe { (*self.context).app_name = c_str.as_ptr() };
         Ok(())
     }
+
+    /// Returns the application name.
+    /// If the name is not a valid UTF-8 string a `::std::str::Utf8Error` is returned.
+    pub fn app_name(&self) -> Result<String, ::std::str::Utf8Error> {
+        unsafe{ ffi::ptr_to_string((*self.context).app_name) }
+    }
 }
 impl Drop for SoundIo {
     fn drop(&mut self) {
