@@ -136,6 +136,27 @@ impl SoundIo {
             idx @ _ => Some(idx as i32),
         }
     }
+
+    /// Sets the application name that is shown in the
+    /// system audio mixer and returns `true` if it could
+    /// be set.
+    /// The `name` must **not** contain a `:` character.
+    ///
+    /// TODO: Return a `Result` instead of `bool`?
+    pub fn set_app_name<T: Into<String>>(&self, name: T) -> bool {
+        let s = name.into();
+        if s.contains(":") {
+            return false;
+        } else {
+            match CString::new(s) {
+                Ok(cstr) => {
+                    unsafe { (*self.context).app_name = cstr.as_ptr() };
+                    true
+                }
+                Err(_) => false,
+            }
+        }
+    }
 }
 impl Drop for SoundIo {
     fn drop(&mut self) {
