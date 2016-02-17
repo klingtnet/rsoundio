@@ -112,10 +112,9 @@ impl<'a> OutStream<'a> {
     /// Possible errors:
     ///
     /// - `ffi::SioErrorInvalid`
-    ///     - TODO: implement format setting
-    ///     - SoundIoDevice::aim is not #SoundIoDeviceAimOutput
-    ///     - SoundIoOutStream::format is not valid
-    ///     - SoundIoOutStream::channel_count is greater than #SOUNDIO_MAX_CHANNELS
+    ///     - device is not an *output* device
+    ///     - format is not valid
+    ///     - `channel_count` is greater than 24
     /// - `ffi::SioError::NoMem`
     /// - `ffi::SioError::OpeningDevice`
     /// - `ffi::SioError::BackendDisconnected`
