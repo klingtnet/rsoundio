@@ -137,6 +137,18 @@ impl SoundIo {
         }
     }
 
+    /// Returns the default output `Device` of the backend.
+    /// `None` if you aren't connected to a backend.
+    pub fn default_output_device(&self) -> Option<Device> {
+        self.default_output_device_index().and_then(|idx| self.get_output_device(idx))
+    }
+
+    /// Returns the default input `Device` of the backend.
+    /// `None` if you aren't connected to a backend.
+    pub fn default_input_device(&self) -> Option<Device> {
+        self.default_input_device_index().and_then(|idx| self.get_input_device(idx))
+    }
+
     /// Sets the application name that is shown in the
     /// system audio mixer and returns `true` if it could
     /// be set.
