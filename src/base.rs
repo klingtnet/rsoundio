@@ -239,8 +239,10 @@ impl SoundIo {
         self.default_input_device_index().and_then(|idx| self.get_input_device(idx))
     }
 
-    /// Sets the application name that is shown in the
+    /// Sets the application name which is shown in the
     /// system audio mixer.
+    /// Call this **before** connecting to an audio backend, otherwise
+    /// the setting won't have any effect.
     /// If the `name` contains a null byte, a `NulError` is returned.
     /// The `:` characters in the `name` will be replaced by `_`.
     pub fn set_app_name<T: Into<String>>(&self, name: T) -> Result<(), NulError>{
