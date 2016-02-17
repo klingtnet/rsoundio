@@ -1,5 +1,6 @@
 use std::fmt::Display;
 use std::os::raw::c_int;
+use std::ffi::{CString, NulError};
 
 use ffi;
 use stream::OutStream;
@@ -150,24 +151,14 @@ impl SoundIo {
     }
 
     /// Sets the application name that is shown in the
-    /// system audio mixer and returns `true` if it could
-    /// be set.
-    /// The `name` must **not** contain a `:` character.
-    ///
-    /// TODO: Return a `Result` instead of `bool`?
-    pub fn set_app_name<T: Into<String>>(&self, name: T) -> bool {
-        let s = name.into();
-        if s.contains(":") {
-            return false;
-        } else {
-            match CString::new(s) {
-                Ok(cstr) => {
-                    unsafe { (*self.context).app_name = cstr.as_ptr() };
-                    true
-                }
-                Err(_) => false,
-            }
-        }
+    /// system audio mixer.
+    /// If the `name` contains a null byte, a `NulError` is returned.
+    /// The `:` characters in the `name` will be replaced by `_`.
+    pub fn set_app_name<T: Into<String>>(&self, name: T) -> Result<(), NulError>{
+        let s = name.into().s.replace(":", "_");
+        let c_str = try!(CString::new(s));
+        unsafe { (*self.context).app_name = c_str.as_ptr() };
+        Ok(())
     }
 }
 impl Drop for SoundIo {
