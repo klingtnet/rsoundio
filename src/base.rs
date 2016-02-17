@@ -245,7 +245,7 @@ impl SoundIo {
     /// If the `name` contains a null byte, a `NulError` is returned.
     /// The `:` characters in the `name` will be replaced by `_`.
     pub fn set_app_name<T: Into<String>>(&self, name: T) -> Result<(), NulError>{
-        let s = name.into().s.replace(":", "_");
+        let s = name.into().replace(":", "_");
         let c_str = try!(CString::new(s));
         unsafe { (*self.context).app_name = c_str.as_ptr() };
         Ok(())
