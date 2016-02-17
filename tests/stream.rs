@@ -8,6 +8,8 @@ use std::time::Duration;
 fn test_outstream() {
     let sio = rsoundio::SoundIo::new();
     sio.connect_backend(rsoundio::ffi::SioBackend::Dummy).unwrap();
+    let current_backend = sio.current_backend().unwrap();
+    assert_eq!(current_backend, rsoundio::ffi::SioBackend::Dummy);
     sio.flush_events();
     let fmt;
     let dev_idx = sio.default_output_device_index().unwrap();
