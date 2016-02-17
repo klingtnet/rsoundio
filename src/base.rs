@@ -40,10 +40,10 @@ impl SoundIo {
     /// - `ffi::SioError::NoMem`
     /// - `ffi::SioError::SystemResources`
     /// - `ffi::SioError::NoSuchClient`
-    pub fn connect(&self) -> Option<ffi::SioError> {
+    pub fn connect(&self) -> SioResult<()> {
         match unsafe { ffi::soundio_connect(self.context) } {
-            ffi::SioError::None => None,
-            err @ _ => Some(err),
+            ffi::SioError::None => Ok(()),
+            err @ _ => Err(err),
         }
     }
 
@@ -57,12 +57,11 @@ impl SoundIo {
     /// - `ffi::SioError::NoSuchClient`
     /// - `ffi::SioError::InitAudioBackend`
     /// - `ffi::SioError::BackendDisconnected`
-    pub fn connect_backend(&self, backend: ffi::SioBackend) -> Option<ffi::SioError> {
+    pub fn connect_backend(&self, backend: ffi::SioBackend) -> SioResult<()> {
         match unsafe { ffi::soundio_connect_backend(self.context, backend) } {
-            ffi::SioError::None => None,
+            ffi::SioError::None => Ok(()),
             err @ _ => {
-                println!("{:?}", err);
-                Some(err)
+                Err(err)
             }
         }
     }

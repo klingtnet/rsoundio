@@ -6,15 +6,15 @@ fn test_soundio() {
     assert!(sio.backend_count() > 0);
     assert!(sio.get_backend(0).is_some());
     assert!(sio.get_backend(-1).is_none());
-    assert!(sio.connect().is_none());
+    sio.connect().unwrap();
     sio.disconnect();
     if sio.have_backend(rsoundio::ffi::SioBackend::Alsa) {
-        assert!(sio.connect_backend(rsoundio::ffi::SioBackend::Alsa)
-                   .is_none());
+        sio.connect_backend(rsoundio::ffi::SioBackend::Alsa)
+           .unwrap();
         sio.disconnect();
     }
     assert!(rsoundio::SoundIo::channel_layout_builtin_count() >= 0);
-    assert!(sio.connect().is_none());
+    sio.connect().unwrap();
     sio.flush_events();
     assert!(sio.output_device_count().unwrap() > 0);
     assert!(sio.input_device_count().unwrap() > 0);
@@ -63,7 +63,7 @@ fn test_enums() {
 #[test]
 fn test_device() {
     let sio = rsoundio::SoundIo::new();
-    assert!(sio.connect().is_none());
+    sio.connect().unwrap();
     sio.flush_events();
     let in_dev_idx = sio.default_input_device_index().unwrap();
     let out_dev_idx = sio.default_output_device_index().unwrap();
