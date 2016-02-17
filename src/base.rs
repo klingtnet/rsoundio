@@ -79,7 +79,7 @@ impl SoundIo {
     /// Returns a backend at the specified index.
     /// If the index is not in range [0, backend_count), then
     /// `None` is returned.
-    pub fn get_backend(&self, idx: i32) -> Option<ffi::SioBackend> {
+    pub fn backend(&self, idx: i32) -> Option<ffi::SioBackend> {
         match unsafe { ffi::soundio_get_backend(self.context, idx) } {
             ffi::SioBackend::None => None,
             backend @ _ => Some(backend),
@@ -185,7 +185,7 @@ impl SoundIo {
     /// `idx` must be in [0, `input_device_count`)
     /// Returns `None` if you never called `flush_events` or if you provide
     /// invalid parameter values.
-    pub fn get_input_device(&self, idx: i32) -> Option<Device> {
+    pub fn input_device(&self, idx: i32) -> Option<Device> {
         let dev_ptr = unsafe { ffi::soundio_get_input_device(self.context, idx) };
         if dev_ptr.is_null() {
             None
@@ -198,7 +198,7 @@ impl SoundIo {
     /// `idx` must be in [0, `output_device_count`)
     /// Returns `None` if you never called `flush_events` or if you provide
     /// invalid parameter values.
-    pub fn get_output_device(&self, idx: i32) -> Option<Device> {
+    pub fn output_device(&self, idx: i32) -> Option<Device> {
         let dev_ptr = unsafe { ffi::soundio_get_output_device(self.context, idx) };
         if dev_ptr.is_null() {
             None
@@ -230,13 +230,13 @@ impl SoundIo {
     /// Returns the default output `Device` of the backend.
     /// `None` if you aren't connected to a backend.
     pub fn default_output_device(&self) -> Option<Device> {
-        self.default_output_device_index().and_then(|idx| self.get_output_device(idx))
+        self.default_output_device_index().and_then(|idx| self.output_device(idx))
     }
 
     /// Returns the default input `Device` of the backend.
     /// `None` if you aren't connected to a backend.
     pub fn default_input_device(&self) -> Option<Device> {
-        self.default_input_device_index().and_then(|idx| self.get_input_device(idx))
+        self.default_input_device_index().and_then(|idx| self.input_device(idx))
     }
 
     /// Sets the application name which is shown in the
@@ -280,7 +280,7 @@ impl ChannelLayout {
 
     /// Returns a builtin channel layout or `None` if
     /// `idx` *not* in [0, `SoundIo::channel_layout_builtin_count`).
-    pub fn get_builtin(idx: i32) -> Option<Self> {
+    pub fn builtin(idx: i32) -> Option<Self> {
         if 0 <= idx && idx < SoundIo::channel_layout_builtin_count() {
             Some(ChannelLayout::new(unsafe {
                 ffi::soundio_channel_layout_get_builtin(idx as c_int)
@@ -291,7 +291,7 @@ impl ChannelLayout {
     }
 
     /// Get the default builtin channel layout for the given number of channels.
-    pub fn get_default(channel_count: i32) -> Option<Self> {
+    pub fn default(channel_count: i32) -> Option<Self> {
         if channel_count < 0 {
             None
         } else {

@@ -15,7 +15,7 @@ macro_rules! write_stream {
         /// as `channel_count` are provided,
         /// then a `ffi::SioError::Invalid` is returned.
         pub fn $name(&self, min_frame_count: i32, buffers: &Vec<Vec<$t>>) -> SioResult<i32> {
-            let channel_count = self.get_layout().channel_count();
+            let channel_count = self.layout().channel_count();
             // check if buffer contains frames for all channels
             if buffers.len() < channel_count as usize {
                 return Err(ffi::SioError::Invalid);
@@ -309,7 +309,7 @@ impl<'a> OutStream<'a> {
     /// Possible errors:
     ///
     /// - `ffi::SioError::Streaming`
-    pub fn get_latency(&self) -> SioResult<f64> {
+    pub fn latency(&self) -> SioResult<f64> {
         let mut latency = 0.0f64;
         match unsafe {
             ffi::soundio_outstream_get_latency(self.stream, &mut latency as *mut c_double)
@@ -335,7 +335,7 @@ impl<'a> OutStream<'a> {
     /// If the device doesn't support the format
     /// `ffi::SioError::IncompatibleDevice` is returned.
     pub fn set_format(&self, format: ffi::SioFormat) -> SioResult<()> {
-        let dev = self.get_device();
+        let dev = self.device();
         if dev.supports_format(format) {
             unsafe { (*self.stream).format = format };
             Ok(())
@@ -345,17 +345,17 @@ impl<'a> OutStream<'a> {
     }
 
     /// Returns the channel layout of the output stream.
-    pub fn get_layout(&self) -> ChannelLayout {
+    pub fn layout(&self) -> ChannelLayout {
         ChannelLayout::new(unsafe { &(*self.stream).layout })
     }
 
     /// Returns the sample rate of the output stream.
-    pub fn get_sample_rate(&self) -> i32 {
+    pub fn sample_rate(&self) -> i32 {
         unsafe { (*self.stream).sample_rate as i32 }
     }
 
     /// Returns the underlying device of the output stream.
-    pub fn get_device(&self) -> Device {
+    pub fn device(&self) -> Device {
         let dev = Device::new(unsafe { (*self.stream).device });
         dev.inc_ref();
         dev

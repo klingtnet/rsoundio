@@ -14,13 +14,13 @@ fn test_outstream() {
     let fmt;
     let dev_idx = sio.default_output_device_index().unwrap();
     let mut frames: Vec<Vec<f32>> = vec![vec![], vec![]];
-    let dev = sio.get_output_device(dev_idx).unwrap();
+    let dev = sio.output_device(dev_idx).unwrap();
     let mut stream = dev.create_outstream().unwrap();
     stream.open().unwrap();
     fmt = stream.current_format().unwrap();
     let f = 4400f32;
-    let sr = stream.get_sample_rate();
-    let layout = stream.get_layout();
+    let sr = stream.sample_rate();
+    let layout = stream.layout();
     let channels = layout.channel_count();
     let phi = 2.0 * f * consts::PI / (sr as f32);
     let l: Vec<f32> = (0..4096).map(|i| f32::sin(i as f32 * phi)).collect();
@@ -29,7 +29,7 @@ fn test_outstream() {
     let cb = |out: rsoundio::OutStream, min_frame_count: i32, max_frame_count: i32| {
         let frames_written = out.write_stream_f32(min_frame_count, &frames).unwrap();
         assert!(frames_written > 0);
-        out.get_latency().map(|latency| assert!(latency >= 0.0));
+        out.latency().map(|latency| assert!(latency >= 0.0));
     };
     stream.register_write_callback(Box::new(cb));
     let ucb = |out: rsoundio::OutStream| println!("Underflow!");

@@ -284,7 +284,7 @@ impl Display for SioFormat {
 }
 impl SioFormat {
     /// Returns the number of bytes a sample takes in this format.
-    pub fn get_bytes_per_sample(self) -> i32 {
+    pub fn bytes_per_sample(self) -> i32 {
         unsafe { soundio_get_bytes_per_sample(self) as i32 }
     }
 }
