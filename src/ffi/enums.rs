@@ -198,7 +198,7 @@ pub enum SioChannelLayoutId {
 }
 
 #[allow(dead_code,non_camel_case_types)]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(u32)]
 pub enum SioBackend {
     None = 0,
