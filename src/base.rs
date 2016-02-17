@@ -417,17 +417,15 @@ impl Device {
         unsafe { ffi::soundio_device_nearest_sample_rate(self.device, sample_rate) as i32 }
     }
 
-    // TODO: Return a Result and `ffi::SioError::NoMem` if stream is `None`.
-    /// Allocates memory and sets defaults. Next you should fill out the struct fields
-    /// and then call `OutStream::open`.
+    /// Returns an OutStream struct with default settings.
     /// Sets all fields to defaults.
-    /// Returns `None` if and only if memory could not be allocated.
-    pub fn create_outstream(&self) -> Option<OutStream> {
+    /// Returns `ffi::SioError::NoMem` if and only if memory could not be allocated.
+    pub fn create_outstream(&self) -> SioResult<OutStream> {
         let stream_ptr = unsafe { ffi::soundio_outstream_create(self.device) };
         if stream_ptr.is_null() {
-            None
+            Err(ffi::SioError::NoMem)
         } else {
-            Some(OutStream::new(stream_ptr))
+            Ok(OutStream::new(stream_ptr))
         }
     }
 
