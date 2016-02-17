@@ -243,7 +243,7 @@ pub struct SoundIoDevice {
     /// Possible errors:
     /// * #SoundIoErrorOpeningDevice
     /// * #SoundIoErrorNoMem
-    pub probe_error: c_int,
+    pub probe_error: SioError,
 }
 impl Clone for SoundIoDevice {
     fn clone(&self) -> Self {
