@@ -101,6 +101,7 @@ impl<'a> OutStream<'a> {
         }
     }
 
+    /// Change settings (e.g. `set_format`) **before** calling `open`.
     /// After you call this function, `OutStream::software_latency` is set to
     /// the correct value.
     ///
