@@ -125,10 +125,10 @@ impl<'a> OutStream<'a> {
     ///   greater than the number of channels the backend can handle.
     /// - `ffi::SioErrorIncompatibleDevice` - stream parameters requested are not
     ///   compatible with the chosen device.
-    pub fn open(&self) -> Option<ffi::SioError> {
+    pub fn open(&self) -> SioResult<()> {
         match unsafe { ffi::soundio_outstream_open(self.stream) } {
-            ffi::SioError::None => None,
-            err @ _ => Some(err),
+            ffi::SioError::None => Ok(()),
+            err @ _ => Err(err),
         }
     }
 
