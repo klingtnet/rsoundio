@@ -1,5 +1,6 @@
 use std::os::raw::{c_int, c_double, c_void};
 use std::{ptr, slice};
+use std::ffi::{CString, NulError};
 
 use ffi;
 use base::*;
@@ -91,6 +92,7 @@ impl<'a> Drop for OutStreamCallbacks<'a> {
 pub struct OutStream<'a> {
     stream: *mut ffi::SoundIoOutStream,
     callbacks: Box<OutStreamCallbacks<'a>>,
+    name: CString,
 }
 impl<'a> OutStream<'a> {
     pub fn new(raw_stream: *mut ffi::SoundIoOutStream) -> Self {
@@ -98,6 +100,7 @@ impl<'a> OutStream<'a> {
         OutStream {
             stream: raw_stream,
             callbacks: callbacks,
+            name: CString::new("rsoundio").unwrap(),
         }
     }
 
@@ -359,6 +362,35 @@ impl<'a> OutStream<'a> {
         let dev = Device::new(unsafe { (*self.stream).device });
         dev.inc_ref();
         dev
+    }
+
+    /// Sets the stream name to `name`.
+    /// PulseAudio uses this for the stream name.
+    /// JACK uses this for the client name of the client that connects when you
+    /// open the stream.
+    /// WASAPI uses this for the session display name.
+    /// Colons (`:`) contained in `name` will be replaced with `_`.
+    pub fn set_name<T: Into<String>>(&mut self, name: T) -> Result<(), NulError> {
+        let s = name.into().replace(":", "_");
+        self.name = try!(CString::new(s));
+        unsafe { (*self.stream).name = self.name.as_ptr() };
+        Ok(())
+    }
+
+    /// Returns the stream name of `None` if the name wasn't set.
+    pub fn name(&self) -> Option<String> {
+        let s_ptr = unsafe { (*self.stream).name };
+        if unsafe { !s_ptr.is_null() } {
+            match ffi::ptr_to_string(s_ptr) {
+                Ok(s) => Some(s),
+                Err(e) => {
+                    println!("err: {}", e);
+                    None
+                }
+            }
+        } else {
+            None
+        }
     }
 
     /// Destroys the output stream.
