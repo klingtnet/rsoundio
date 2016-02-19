@@ -407,7 +407,7 @@ pub struct SoundIoInStream {
     pub bytes_per_sample: c_int,
     /// If setting the channel layout fails for some reason, this field is set
     /// to an error code. Possible error codes are: #SoundIoErrorIncompatibleDevice
-    pub layout_error: c_int,
+    pub layout_error: SioError,
 }
 impl Clone for SoundIoInStream {
     fn clone(&self) -> Self {
