@@ -1,7 +1,5 @@
 use std::os::raw::{c_int, c_double, c_void, c_char};
-use std::mem;
 use std::clone::Clone;
-use std::default::Default;
 
 use ffi::enums::*;
 
