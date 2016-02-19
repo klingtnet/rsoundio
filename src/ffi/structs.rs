@@ -20,11 +20,6 @@ impl Clone for SoundIoChannelLayout {
         *self
     }
 }
-impl Default for SoundIoChannelLayout {
-    fn default() -> Self {
-        unsafe { mem::zeroed() }
-    }
-}
 
 #[repr(C)]
 #[derive(Copy)]
@@ -35,11 +30,6 @@ pub struct SoundIoSampleRateRange {
 impl Clone for SoundIoSampleRateRange {
     fn clone(&self) -> Self {
         *self
-    }
-}
-impl Default for SoundIoSampleRateRange {
-    fn default() -> Self {
-        unsafe { mem::zeroed() }
     }
 }
 
@@ -58,11 +48,6 @@ pub struct SoundIoChannelArea {
 impl Clone for SoundIoChannelArea {
     fn clone(&self) -> Self {
         *self
-    }
-}
-impl Default for SoundIoChannelArea {
-    fn default() -> Self {
-        unsafe { mem::zeroed() }
     }
 }
 
@@ -131,11 +116,6 @@ pub struct SoundIo {
 impl Clone for SoundIo {
     fn clone(&self) -> Self {
         *self
-    }
-}
-impl Default for SoundIo {
-    fn default() -> Self {
-        unsafe { mem::zeroed() }
     }
 }
 
@@ -250,11 +230,6 @@ impl Clone for SoundIoDevice {
         *self
     }
 }
-impl Default for SoundIoDevice {
-    fn default() -> Self {
-        unsafe { mem::zeroed() }
-    }
-}
 
 /// Represents an audio output stream.
 #[repr(C)]
@@ -356,11 +331,6 @@ impl Clone for SoundIoOutStream {
         *self
     }
 }
-impl Default for SoundIoOutStream {
-    fn default() -> Self {
-        unsafe { mem::zeroed() }
-    }
-}
 
 /// Represents an audio input stream.
 #[repr(C)]
@@ -442,10 +412,5 @@ pub struct SoundIoInStream {
 impl Clone for SoundIoInStream {
     fn clone(&self) -> Self {
         *self
-    }
-}
-impl Default for SoundIoInStream {
-    fn default() -> Self {
-        unsafe { mem::zeroed() }
     }
 }
