@@ -53,27 +53,27 @@ extern "C" fn write_wrapper<W>(raw_out: *mut ffi::SoundIoOutStream, min: c_int, 
 }
 
 extern "C" fn underflow_wrapper<U>(raw_out: *mut ffi::SoundIoOutStream)
-    where U: Fn(OutStream)
+    where U: FnMut(OutStream)
 {
     let out = OutStream::new(raw_out);
-    let callbacks_ptr = unsafe { (*out.stream).userdata as *const Box<OutStreamCallbacks> };
-    let callbacks: &Box<OutStreamCallbacks> = unsafe { &*callbacks_ptr };
-    callbacks.underflow.as_ref().map(|ref f| f(out));
+    let callbacks_ptr = unsafe { (*out.stream).userdata as *mut Box<OutStreamCallbacks> };
+    let callbacks: &mut Box<OutStreamCallbacks> = unsafe { &mut *callbacks_ptr };
+    callbacks.underflow.as_mut().map(|f| f(out));
 }
 
 extern "C" fn error_wrapper<E>(raw_out: *mut ffi::SoundIoOutStream, error: ffi::SioError)
-    where E: Fn(OutStream, ffi::SioError)
+    where E: FnMut(OutStream, ffi::SioError)
 {
     let out = OutStream::new(raw_out);
-    let callbacks_ptr = unsafe { (*out.stream).userdata as *const Box<OutStreamCallbacks> };
-    let callbacks: &Box<OutStreamCallbacks> = unsafe { &*callbacks_ptr };
-    callbacks.error.as_ref().map(|ref f| f(out, error));
+    let callbacks_ptr = unsafe { (*out.stream).userdata as *mut Box<OutStreamCallbacks> };
+    let callbacks: &mut Box<OutStreamCallbacks> = unsafe { &mut *callbacks_ptr };
+    callbacks.error.as_mut().map(|f| f(out, error));
 }
 
 struct OutStreamCallbacks<'a> {
     write: Option<Box<FnMut(OutStream, i32, i32) + 'a>>,
-    underflow: Option<Box<Fn(OutStream) + 'a>>,
-    error: Option<Box<Fn(OutStream, ffi::SioError) + 'a>>,
+    underflow: Option<Box<FnMut(OutStream) + 'a>>,
+    error: Option<Box<FnMut(OutStream, ffi::SioError) + 'a>>,
 }
 impl<'a> Default for OutStreamCallbacks<'a> {
     fn default() -> Self {
@@ -189,7 +189,7 @@ impl<'a> OutStream<'a> {
     /// After this occurs, the outstream waits until the buffer is full to resume playback.
     /// This is called from the `OutStream::write_callback` thread context.
     pub fn register_underflow_callback<U>(&mut self, callback: Box<U>)
-        where U: Fn(OutStream) + 'a
+        where U: FnMut(OutStream) + 'a
     {
         self.callbacks.underflow = Some(callback);
         unsafe {
@@ -208,7 +208,7 @@ impl<'a> OutStream<'a> {
     /// a message to stderr and then call `abort`.
     /// This is called from the `OutStream::write_callback` thread context.
     pub fn register_error_callback<E>(&mut self, callback: Box<E>)
-        where E: Fn(OutStream, ffi::SioError) + 'a
+        where E: FnMut(OutStream, ffi::SioError) + 'a
     {
         self.callbacks.error = Some(callback);
         unsafe {
