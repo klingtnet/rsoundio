@@ -291,11 +291,32 @@ impl<'a> OutStream<'a> {
     /// - `ffi::SioError::IncompatibleBackend` - backend does not support
     ///   pausing/unpausing.
     /// - `ffi::SioError::Invalid` - outstream not opened and started
-    pub fn pause(&self, pause: bool) -> Option<ffi::SioError> {
+    pub fn pause(&self) -> Option<ffi::SioError> {
+        self.stream_pause(true)
+    }
+
+    /// Unpauses the stream. See `pause` for more details.
+    ///
+    /// Possible errors:
+    ///
+    /// - `ffi::SioError::BackendDisconnected`
+    /// - `ffi::SioError::Streaming`
+    /// - `ffi::SioError::IncompatibleDevice` - device does not support
+    ///   pausing/unpausing. This error code might not be returned even if the
+    ///   device does not support pausing/unpausing.
+    /// - `ffi::SioError::IncompatibleBackend` - backend does not support
+    ///   pausing/unpausing.
+    /// - `ffi::SioError::Invalid` - outstream not opened and started
+    pub fn unpause(&self) -> Option<ffi::SioError> {
+        self.stream_pause(false)
+    }
+
+    fn stream_pause(&self, pause: bool) -> Option<ffi::SioError> {
         let pause_c_bool = match pause {
             true => 1u8,
             false => 0u8,
         };
+
         match unsafe { ffi::soundio_outstream_pause(self.stream, pause_c_bool) } {
             ffi::SioError::None => None,
             err @ _ => Some(err),
