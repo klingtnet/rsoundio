@@ -44,12 +44,12 @@ macro_rules! write_stream {
 }
 
 extern "C" fn write_wrapper<W>(raw_out: *mut ffi::SoundIoOutStream, min: c_int, max: c_int)
-    where W: Fn(OutStream, i32, i32)
+    where W: FnMut(OutStream, i32, i32)
 {
     let out = OutStream::new(raw_out);
-    let callbacks_ptr = unsafe { (*out.stream).userdata as *const Box<OutStreamCallbacks> };
-    let callbacks: &Box<OutStreamCallbacks> = unsafe { &*callbacks_ptr };
-    callbacks.write.as_ref().map(|ref f| f(out, min as i32, max as i32));
+    let callbacks_ptr = unsafe { (*out.stream).userdata as *mut Box<OutStreamCallbacks> };
+    let callbacks: &mut Box<OutStreamCallbacks> = unsafe { &mut *callbacks_ptr };
+    callbacks.write.as_mut().map(|f| f(out, min as i32, max as i32));
 }
 
 extern "C" fn underflow_wrapper<U>(raw_out: *mut ffi::SoundIoOutStream)
@@ -71,7 +71,7 @@ extern "C" fn error_wrapper<E>(raw_out: *mut ffi::SoundIoOutStream, error: ffi::
 }
 
 struct OutStreamCallbacks<'a> {
-    write: Option<Box<Fn(OutStream, i32, i32) + 'a>>,
+    write: Option<Box<FnMut(OutStream, i32, i32) + 'a>>,
     underflow: Option<Box<Fn(OutStream) + 'a>>,
     error: Option<Box<Fn(OutStream, ffi::SioError) + 'a>>,
 }
@@ -171,7 +171,7 @@ impl<'a> OutStream<'a> {
     /// malloc, free, printf, pthread_mutex_lock, sleep, wait, poll, select,
     /// pthread_join, pthread_cond_wait, etc.
     pub fn register_write_callback<W>(&mut self, callback: Box<W>)
-        where W: Fn(OutStream, i32, i32) + 'a
+        where W: FnMut(OutStream, i32, i32) + 'a
     {
         // stored box reference to callback closure
         self.callbacks.write = Some(callback);
