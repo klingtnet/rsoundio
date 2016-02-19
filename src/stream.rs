@@ -414,6 +414,19 @@ impl<'a> OutStream<'a> {
         }
     }
 
+    /// Returns an `ffi::SioError` if the layout is incompatible
+    /// with the audio output device.
+    /// If the layout is compatible `()` is returned.
+    pub fn layout_error(&self) -> SioResult<()> {
+        match unsafe { (*self.stream).layout_error } {
+            0 => Ok(()),
+            e @ _ => {
+                println!("layout error: {}", e);
+                Ok(())
+            }
+        }
+    }
+
     /// Destroys the output stream.
     /// Calls this when your application shuts down.
     /// NOTE: This can break if a callback is still active.
