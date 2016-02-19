@@ -346,7 +346,7 @@ impl<'a> OutStream<'a> {
 
     /// Returns the current `format` or a `ffi::SioError::Invalid` if
     /// the format is not set.
-    pub fn current_format(&self) -> SioResult<ffi::SioFormat> {
+    pub fn format(&self) -> SioResult<ffi::SioFormat> {
         match unsafe { (*self.stream).format } {
             ffi::SioFormat::Invalid => Err(ffi::SioError::Invalid),
             fmt @ _ => Ok(fmt),
