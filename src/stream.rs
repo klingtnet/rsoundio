@@ -34,7 +34,7 @@ macro_rules! write_stream {
                 for channel in 0..channel_count as usize {
                     let area = areas[channel];
                     let addr = (area.ptr as usize + area.step as usize * idx) as *mut $t;
-                    unsafe { *addr = buffers[channel][idx] }
+                    unsafe { *addr = buffers[channel][idx] };
                 }
             }
             self.end_write().map_or(Ok(actual_frame_count), |err| Err(err))
