@@ -17,7 +17,7 @@ fn test_outstream() {
     let dev = sio.output_device(dev_idx).unwrap();
     let mut stream = dev.create_outstream().unwrap();
     stream.open().unwrap();
-    fmt = stream.current_format().unwrap();
+    fmt = stream.format().unwrap();
     let f = 4400f32;
     let sr = stream.sample_rate();
     let layout = stream.layout();
@@ -39,9 +39,9 @@ fn test_outstream() {
     assert!(stream.start().is_none());
     //sio.wait_events();
     thread::sleep(Duration::new(1,0));
-    assert!(stream.pause(true).is_none());
+    assert!(stream.pause().is_none());
     thread::sleep(Duration::new(1,0));
-    assert!(stream.pause(false).is_none());
+    assert!(stream.unpause().is_none());
     assert!(stream.clear_buffer().is_none());
     thread::sleep(Duration::new(1,0));
     stream.destroy();
