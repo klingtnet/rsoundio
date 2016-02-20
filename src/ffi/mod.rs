@@ -1,4 +1,5 @@
 pub mod enums;
+pub mod utils;
 mod structs;
 mod functions;
 

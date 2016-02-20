@@ -251,7 +251,7 @@ impl SoundIo {
     /// Returns the application name.
     /// If the name is not a valid UTF-8 string a `::std::str::Utf8Error` is returned.
     pub fn app_name(&self) -> Result<String, ::std::str::Utf8Error> {
-        unsafe { ffi::ptr_to_string((*self.context).app_name) }
+        unsafe { ffi::utils::ptr_to_string((*self.context).app_name) }
     }
 }
 impl Drop for SoundIo {
@@ -358,7 +358,7 @@ impl PartialEq for ChannelLayout {
 impl Display for ChannelLayout {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         let str_ptr = unsafe { (*self.layout).name };
-        write!(f, "{}", ffi::ptr_to_string(str_ptr).unwrap())
+        write!(f, "{}", ffi::utils::ptr_to_string(str_ptr).unwrap())
     }
 }
 
@@ -457,7 +457,7 @@ impl Device {
 impl Display for Device {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         let str_ptr = unsafe { (*self.device).name };
-        write!(f, "{}", ffi::ptr_to_string(str_ptr).unwrap())
+        write!(f, "{}", ffi::utils::ptr_to_string(str_ptr).unwrap())
     }
 }
 impl Drop for Device {

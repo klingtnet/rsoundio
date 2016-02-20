@@ -31,5 +31,6 @@ mod base;
 mod stream;
 
 pub use ffi::enums::*;
+use ffi::utils::*;
 pub use base::*;
 pub use stream::*;

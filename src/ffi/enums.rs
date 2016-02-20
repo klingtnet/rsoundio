@@ -5,11 +5,7 @@ use std::fmt::Display;
 use std::str::Utf8Error;
 
 use ffi::functions::*;
-
-pub fn ptr_to_string(str_ptr: *const c_char) -> Result<String, Utf8Error> {
-    let str_slice: &str = try!(unsafe { CStr::from_ptr(str_ptr) }.to_str());
-    Ok(str_slice.to_string())
-}
+use ffi::utils::*;
 
 /// Possible error codes. You can print the
 /// corresponding error message easily, because

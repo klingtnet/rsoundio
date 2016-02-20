@@ -406,7 +406,7 @@ impl<'a> OutStream<'a> {
     pub fn name(&self) -> Option<String> {
         let s_ptr = unsafe { (*self.stream).name };
         if !s_ptr.is_null() {
-            match ffi::ptr_to_string(s_ptr) {
+            match ffi::utils::ptr_to_string(s_ptr) {
                 Ok(s) => Some(s),
                 Err(e) => {
                     println!("err: {}", e);
