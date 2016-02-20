@@ -1,7 +1,6 @@
 use std::fmt;
 use std::ffi::CString;
 use std::fmt::Display;
-use std::str::Utf8Error;
 
 use ffi::functions::*;
 use ffi::utils::*;
