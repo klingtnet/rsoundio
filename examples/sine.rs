@@ -13,8 +13,8 @@ fn main() {
                                 .map(|i| (phi * i as f32).sin())
                                 .collect();
     // create an audio context
-    let sio = rsoundio::SoundIo::new();
-    sio.set_app_name("rsoundio").unwrap();
+    let mut sio = rsoundio::SoundIo::new();
+    sio.set_app_name("rsoundio-example").unwrap();
     // connect to the default audio backend
     sio.connect().unwrap();
     println!("Connected to backend: {}", sio.current_backend().unwrap());
@@ -25,7 +25,7 @@ fn main() {
     println!("Using output device: {}", dev);
     // create output stream
     let mut out = dev.create_outstream().unwrap();
-    assert!(out.set_name("rsoundio-example-sine").is_ok());
+    assert!(out.set_name("sine").is_ok());
     out.set_format(rsoundio::SioFormat::Float32LE).unwrap();
     println!("Output format: {}", out.format().unwrap());
 
