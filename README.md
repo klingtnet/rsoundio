@@ -14,7 +14,7 @@ For a comparison of libsoundio with other audio libaries, take a look at the [wi
 
 ---
 
-This is a *work in progress* and there are still some things that don't work, especially recording via input streams is not supported yet (see [TODOs](#TODOs).
+This is a *work in progress* and there are still some things that don't work, especially recording via input streams is not supported yet (see [TODOs](#todos).
 Most of the input stream implementation can be copied from the output stream though.
 
 - [documentation](https://docs.klingt.net/rustdoc/rsoundio/)
