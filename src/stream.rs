@@ -27,7 +27,7 @@ macro_rules! write_stream {
             }
 
             // assuming that every channel buffer has the same length
-            let mut frame_count = buffers[0].len() as c_int;
+            let frame_count = buffers[0].len() as c_int;
             let mut raw_areas: *mut ffi::SoundIoChannelArea = ptr::null_mut();
             let actual_frame_count = try!(self.begin_write(&mut raw_areas, &frame_count));
             let areas = unsafe { slice::from_raw_parts_mut(raw_areas, channel_count as usize) };
