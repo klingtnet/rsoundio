@@ -109,8 +109,6 @@ impl SoundIo {
     /// - `on_device_change`
     /// - `on_backend_disconnect`
     ///
-    /// TODO: Implement callback registrations
-    ///
     /// Note that if you do not care about learning about updated devices,
     /// you might call this function only once ever and never call `wait_events`.
     pub fn flush_events(&self) {
