@@ -12,10 +12,14 @@ pub type SioResult<T> = Result<T, ffi::enums::SioError>;
 /// and provides methods to get in-/output `Device`s.
 pub struct SoundIo {
     context: *mut ffi::SoundIo,
+    app_name: CString,
 }
 impl SoundIo {
     pub fn new() -> Self {
-        SoundIo { context: unsafe { ffi::soundio_create() } }
+        SoundIo {
+            context: unsafe { ffi::soundio_create() },
+            app_name: CString::new("rsoundio").unwrap(),
+        }
     }
 
     /// Returns the number builtin channel layouts.
@@ -243,8 +247,8 @@ impl SoundIo {
     /// The `:` characters in the `name` will be replaced by `_`.
     pub fn set_app_name<T: Into<String>>(&self, name: T) -> Result<(), NulError> {
         let s = name.into().replace(":", "_");
-        let c_str = try!(CString::new(s));
-        unsafe { (*self.context).app_name = c_str.as_ptr() };
+        self.app_name = try!(CString::new(s));
+        unsafe { (*self.context).app_name = self.app_name.as_ptr() };
         Ok(())
     }
 
