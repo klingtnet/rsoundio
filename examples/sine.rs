@@ -61,7 +61,7 @@ fn main() {
     let layout = out.layout();
     println!("Output channel layout: {}", layout);
     // start audio output (now the `write_callback` will be called periodically)
-    assert!(out.start().is_none());
+    out.start().unwrap();
     thread::sleep(Duration::new(3, 0));
     println!("Pause for 1s");
     out.pause();

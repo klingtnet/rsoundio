@@ -36,8 +36,8 @@ fn test_outstream() {
     stream.register_underflow_callback(Box::new(ucb));
     let ecb = |out: rsoundio::OutStream, err: rsoundio::ffi::SioError| println!("Error: {}", err);
     stream.register_error_callback(Box::new(ecb));
-    assert!(stream.start().is_none());
     //sio.wait_events();
+    stream.start().unwrap();
     thread::sleep(Duration::new(1,0));
     assert!(stream.pause().is_none());
     thread::sleep(Duration::new(1,0));

@@ -145,10 +145,10 @@ impl<'a> OutStream<'a> {
     /// - `ffi::SioError::NoMem`
     /// - `ffi::SioError::SystemResources`
     /// - `ffi::SioError::BackendDisconnected`
-    pub fn start(&self) -> Option<ffi::SioError> {
+    pub fn start(&self) -> SioResult<()> {
         match unsafe { ffi::soundio_outstream_start(self.stream) } {
-            ffi::SioError::None => None,
-            err @ _ => Some(err),
+            ffi::SioError::None => Ok(()),
+            err @ _ => Err(err),
         }
     }
 
