@@ -401,7 +401,7 @@ impl<'a> OutStream<'a> {
     /// Returns the stream name of `None` if the name wasn't set.
     pub fn name(&self) -> Option<String> {
         let s_ptr = unsafe { (*self.stream).name };
-        if unsafe { !s_ptr.is_null() } {
+        if !s_ptr.is_null() {
             match ffi::ptr_to_string(s_ptr) {
                 Ok(s) => Some(s),
                 Err(e) => {
