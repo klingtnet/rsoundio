@@ -60,9 +60,7 @@ impl SoundIo {
     pub fn connect_backend(&self, backend: ffi::SioBackend) -> SioResult<()> {
         match unsafe { ffi::soundio_connect_backend(self.context, backend) } {
             ffi::SioError::None => Ok(()),
-            err @ _ => {
-                Err(err)
-            }
+            err @ _ => Err(err),
         }
     }
 
@@ -243,7 +241,7 @@ impl SoundIo {
     /// the setting won't have any effect.
     /// If the `name` contains a null byte, a `NulError` is returned.
     /// The `:` characters in the `name` will be replaced by `_`.
-    pub fn set_app_name<T: Into<String>>(&self, name: T) -> Result<(), NulError>{
+    pub fn set_app_name<T: Into<String>>(&self, name: T) -> Result<(), NulError> {
         let s = name.into().replace(":", "_");
         let c_str = try!(CString::new(s));
         unsafe { (*self.context).app_name = c_str.as_ptr() };
@@ -253,7 +251,7 @@ impl SoundIo {
     /// Returns the application name.
     /// If the name is not a valid UTF-8 string a `::std::str::Utf8Error` is returned.
     pub fn app_name(&self) -> Result<String, ::std::str::Utf8Error> {
-        unsafe{ ffi::ptr_to_string((*self.context).app_name) }
+        unsafe { ffi::ptr_to_string((*self.context).app_name) }
     }
 }
 impl Drop for SoundIo {

@@ -289,5 +289,5 @@ impl SioFormat {
     }
 }
 
-//#[allow(dead_code,non_camel_case_types)]
-//enum SoundIoRingBuffer { }
+// #[allow(dead_code,non_camel_case_types)]
+// enum SoundIoRingBuffer { }
