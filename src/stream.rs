@@ -104,7 +104,7 @@ impl<'a> OutStream<'a> {
         OutStream {
             stream: raw_stream,
             callbacks: callbacks,
-            name: CString::new("rsoundio").unwrap(),
+            name: CString::new("outstream").unwrap(),
         }
     }
 
