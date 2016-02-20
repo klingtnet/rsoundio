@@ -1,6 +1,27 @@
 # A Rusty Wrapper for [libsoundio](http://libsound.io)
 
-This is a work in progress.
+Rsoundio is a wrapper for [libsoundio](https://github.com/andrewrk/libsoundio), a cross-platform realtime audio in- and output library.
+
+The following backens are supported:
+
+- JACK
+- PulseAudio
+- ALSA
+- CoreAudio
+- WASAPI
+
+For a comparison of libsoundio with other audio libaries, take a look at the [wiki](https://github.com/andrewrk/libsoundio/wiki).
+
+---
+
+This is a *work in progress* and there are still some things that don't work, especially recording via input streams is not supported yet (see [TODOs](#TODOs).
+Most of the input stream implementation can be copied from the output stream though.
+
+- [documentation](https://docs.klingt.net/rustdoc/rsoundio/)
+
+## Example
+
+`cargo run --example sine`
 
 ## TODOs
 
