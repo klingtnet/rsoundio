@@ -7,16 +7,7 @@ use std::str::Utf8Error;
 use ffi::functions::*;
 use ffi::utils::*;
 
-/// Possible error codes. You can print the
-/// corresponding error message easily, because
-/// this enum implements `Display`.
-///
-/// # Example
-///
-/// ```
-/// use rsoundio::ffi::SioError;
-/// println!("{}", SioError::SystemResources)
-/// ```
+/// Possible error codes.
 #[allow(dead_code,non_camel_case_types)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(u32)]
