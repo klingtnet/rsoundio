@@ -1,6 +1,6 @@
 use std::fmt::Display;
 use std::os::raw::c_int;
-use std::ffi::{CString, NulError};
+use std::ffi::CString;
 
 use ffi;
 use stream::OutStream;
