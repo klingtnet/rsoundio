@@ -5,8 +5,8 @@ use std::ffi::{CString, NulError};
 use ffi;
 use stream::OutStream;
 
-/// Result wrapper that always contains a `ffi::SioError` in error case.
-pub type SioResult<T> = Result<T, ffi::SioError>;
+/// Result wrapper that always contains a `ffi::enums::SioError` in error case.
+pub type SioResult<T> = Result<T, ffi::enums::SioError>;
 
 /// The base struct which can connect to various audio backends
 /// and provides methods to get in-/output `Device`s.
@@ -36,13 +36,13 @@ impl SoundIo {
     ///
     /// Possible errors:
     ///
-    /// - `ffi::SioError::Invalid`
-    /// - `ffi::SioError::NoMem`
-    /// - `ffi::SioError::SystemResources`
-    /// - `ffi::SioError::NoSuchClient`
+    /// - `ffi::enums::SioError::Invalid`
+    /// - `ffi::enums::SioError::NoMem`
+    /// - `ffi::enums::SioError::SystemResources`
+    /// - `ffi::enums::SioError::NoSuchClient`
     pub fn connect(&self) -> SioResult<()> {
         match unsafe { ffi::soundio_connect(self.context) } {
-            ffi::SioError::None => Ok(()),
+            ffi::enums::SioError::None => Ok(()),
             err @ _ => Err(err),
         }
     }
@@ -51,15 +51,15 @@ impl SoundIo {
     /// specific backend.
     /// Possible errors:
     ///
-    /// - `ffi::SioError::Invalid`
-    /// - `ffi::SioError::BackendUnavailable`
-    /// - `ffi::SioError::SystemResources`
-    /// - `ffi::SioError::NoSuchClient`
-    /// - `ffi::SioError::InitAudioBackend`
-    /// - `ffi::SioError::BackendDisconnected`
-    pub fn connect_backend(&self, backend: ffi::SioBackend) -> SioResult<()> {
+    /// - `ffi::enums::SioError::Invalid`
+    /// - `ffi::enums::SioError::BackendUnavailable`
+    /// - `ffi::enums::SioError::SystemResources`
+    /// - `ffi::enums::SioError::NoSuchClient`
+    /// - `ffi::enums::SioError::InitAudioBackend`
+    /// - `ffi::enums::SioError::BackendDisconnected`
+    pub fn connect_backend(&self, backend: ffi::enums::SioBackend) -> SioResult<()> {
         match unsafe { ffi::soundio_connect_backend(self.context, backend) } {
-            ffi::SioError::None => Ok(()),
+            ffi::enums::SioError::None => Ok(()),
             err @ _ => Err(err),
         }
     }
@@ -77,25 +77,25 @@ impl SoundIo {
     /// Returns a backend at the specified index.
     /// If the index is not in range [0, backend_count), then
     /// `None` is returned.
-    pub fn backend(&self, idx: i32) -> Option<ffi::SioBackend> {
+    pub fn backend(&self, idx: i32) -> Option<ffi::enums::SioBackend> {
         match unsafe { ffi::soundio_get_backend(self.context, idx) } {
-            ffi::SioBackend::None => None,
+            ffi::enums::SioBackend::None => None,
             backend @ _ => Some(backend),
         }
     }
 
     /// Returns the current backend or `None` if neither
     /// `connect` nor `connect_backend` or `disconnect` was called.
-    pub fn current_backend(&self) -> Option<ffi::SioBackend> {
+    pub fn current_backend(&self) -> Option<ffi::enums::SioBackend> {
         match unsafe { (*self.context).current_backend } {
-            ffi::SioBackend::None => None,
+            ffi::enums::SioBackend::None => None,
             backend @ _ => Some(backend),
         }
     }
 
     /// Returns `true` if libsoundio was compiled against `backend`.
     /// Otherwise `false` is returned.
-    pub fn have_backend(&self, backend: ffi::SioBackend) -> bool {
+    pub fn have_backend(&self, backend: ffi::enums::SioBackend) -> bool {
         unsafe { ffi::soundio_have_backend(backend) == 1u8 }
     }
 
@@ -298,7 +298,7 @@ impl ChannelLayout {
     }
 
     /// Return the index of `channel` in the layout, or `None` if not found.
-    pub fn find_channel(&self, channel: ffi::SioChannelId) -> Option<i32> {
+    pub fn find_channel(&self, channel: ffi::enums::SioChannelId) -> Option<i32> {
         match unsafe { ffi::soundio_channel_layout_find_channel(self.layout, channel) } {
             -1 => None,
             idx @ _ => Some(idx),
@@ -393,7 +393,7 @@ impl Device {
     /// Convenience function.
     /// Returns whether `format` is included in the device's
     /// supported formats.
-    pub fn supports_format(&self, format: ffi::SioFormat) -> bool {
+    pub fn supports_format(&self, format: ffi::enums::SioFormat) -> bool {
         unsafe { ffi::soundio_device_supports_format(self.device, format) == 1u8 }
     }
 
@@ -422,11 +422,11 @@ impl Device {
 
     /// Returns an OutStream struct with default settings.
     /// Sets all fields to defaults.
-    /// Returns `ffi::SioError::NoMem` if and only if memory could not be allocated.
+    /// Returns `ffi::enums::SioError::NoMem` if and only if memory could not be allocated.
     pub fn create_outstream(&self) -> SioResult<OutStream> {
         let stream_ptr = unsafe { ffi::soundio_outstream_create(self.device) };
         if stream_ptr.is_null() {
-            Err(ffi::SioError::NoMem)
+            Err(ffi::enums::SioError::NoMem)
         } else {
             Ok(OutStream::new(stream_ptr))
         }
@@ -437,19 +437,19 @@ impl Device {
         unsafe { (*self.device).ref_count as i32 }
     }
 
-    /// This is set to a `ffi::SioError` representing the result of the device
-    /// probe. Ideally this will be `ffi::SioError::None` in which case all the
+    /// This is set to a `ffi::enums::SioError` representing the result of the device
+    /// probe. Ideally this will be `ffi::enums::SioError::None` in which case all the
     /// fields of the device will be populated. If there is an error code here
     /// then information about formats, sample rates, and channel layouts might
     /// be missing.
     ///
     /// Possible errors:
     ///
-    /// - `ffi::SioError::OpeningDevice`
-    /// - `ffi::SioError::NoMem`
-    pub fn probe_error(&self) -> Option<ffi::SioError> {
+    /// - `ffi::enums::SioError::OpeningDevice`
+    /// - `ffi::enums::SioError::NoMem`
+    pub fn probe_error(&self) -> Option<ffi::enums::SioError> {
         match unsafe { (*self.device).probe_error } {
-            ffi::SioError::None => None,
+            ffi::enums::SioError::None => None,
             error @ _ => Some(error),
         }
     }

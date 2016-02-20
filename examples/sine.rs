@@ -26,7 +26,7 @@ fn main() {
     // create output stream
     let mut out = dev.create_outstream().unwrap();
     assert!(out.set_name("rsoundio-example-sine").is_ok());
-    out.set_format(rsoundio::ffi::SioFormat::Float32LE).unwrap();
+    out.set_format(rsoundio::SioFormat::Float32LE).unwrap();
     println!("Output format: {}", out.format().unwrap());
 
     // register callbacks
@@ -48,7 +48,7 @@ fn main() {
         println!("Underflow in {} occured!", out.name().unwrap())
     }));
     out.register_error_callback(Box::new(|out: rsoundio::OutStream,
-                                          err: rsoundio::ffi::SioError| {
+                                          err: rsoundio::SioError| {
         println!("{} error: {}", out.name().unwrap(), err)
     }));
 

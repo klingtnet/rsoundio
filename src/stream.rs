@@ -18,16 +18,16 @@ macro_rules! write_stream {
         /// If the provided buffers contain less frames
         /// than `min_frame_count`, or less buffers
         /// as `channel_count` are provided,
-        /// then a `ffi::SioError::Invalid` is returned.
+        /// then a `ffi::enums::SioError::Invalid` is returned.
         pub fn $name(&self, min_frame_count: i32, buffers: &Vec<Vec<$t>>) -> SioResult<i32> {
             let channel_count = self.layout().channel_count();
             // check if buffer contains frames for all channels
             if buffers.len() < channel_count as usize {
-                return Err(ffi::SioError::Invalid);
+                return Err(ffi::enums::SioError::Invalid);
             }
             // check if there are at least min_frame_count frames for all channels
             if !buffers.iter().map(|c| c.len()).all(|l| l >= min_frame_count as usize) {
-                return Err(ffi::SioError::Invalid);
+                return Err(ffi::enums::SioError::Invalid);
             }
 
             // assuming that every channel buffer has the same length
@@ -65,8 +65,8 @@ extern "C" fn underflow_wrapper<U>(raw_out: *mut ffi::SoundIoOutStream)
     callbacks.underflow.as_mut().map(|f| f(out));
 }
 
-extern "C" fn error_wrapper<E>(raw_out: *mut ffi::SoundIoOutStream, error: ffi::SioError)
-    where E: FnMut(OutStream, ffi::SioError)
+extern "C" fn error_wrapper<E>(raw_out: *mut ffi::SoundIoOutStream, error: ffi::enums::SioError)
+    where E: FnMut(OutStream, ffi::enums::SioError)
 {
     let out = OutStream::new(raw_out);
     let callbacks_ptr = unsafe { (*out.stream).userdata as *mut Box<OutStreamCallbacks> };
@@ -77,7 +77,7 @@ extern "C" fn error_wrapper<E>(raw_out: *mut ffi::SoundIoOutStream, error: ffi::
 struct OutStreamCallbacks<'a> {
     write: Option<Box<FnMut(OutStream, i32, i32) + 'a>>,
     underflow: Option<Box<FnMut(OutStream) + 'a>>,
-    error: Option<Box<FnMut(OutStream, ffi::SioError) + 'a>>,
+    error: Option<Box<FnMut(OutStream, ffi::enums::SioError) + 'a>>,
 }
 impl<'a> Default for OutStreamCallbacks<'a> {
     fn default() -> Self {
@@ -118,23 +118,23 @@ impl<'a> OutStream<'a> {
     ///
     /// Possible errors:
     ///
-    /// - `ffi::SioErrorInvalid`
+    /// - `ffi::enums::SioErrorInvalid`
     ///     - device is not an *output* device
     ///     - format is not valid
     ///     - `channel_count` is greater than 24
-    /// - `ffi::SioError::NoMem`
-    /// - `ffi::SioError::OpeningDevice`
-    /// - `ffi::SioError::BackendDisconnected`
-    /// - `ffi::SioError::SystemResources`
-    /// - `ffi::SioError::NoSuchClient` - when JACK returns `JackNoSuchClient`
-    /// - `ffi::SioErrorOpeningDevice`
-    /// - `ffi::SioErrorIncompatibleBackend` - `OutStream::channel_count` is
+    /// - `ffi::enums::SioError::NoMem`
+    /// - `ffi::enums::SioError::OpeningDevice`
+    /// - `ffi::enums::SioError::BackendDisconnected`
+    /// - `ffi::enums::SioError::SystemResources`
+    /// - `ffi::enums::SioError::NoSuchClient` - when JACK returns `JackNoSuchClient`
+    /// - `ffi::enums::SioErrorOpeningDevice`
+    /// - `ffi::enums::SioErrorIncompatibleBackend` - `OutStream::channel_count` is
     ///   greater than the number of channels the backend can handle.
-    /// - `ffi::SioErrorIncompatibleDevice` - stream parameters requested are not
+    /// - `ffi::enums::SioErrorIncompatibleDevice` - stream parameters requested are not
     ///   compatible with the chosen device.
     pub fn open(&self) -> SioResult<()> {
         match unsafe { ffi::soundio_outstream_open(self.stream) } {
-            ffi::SioError::None => Ok(()),
+            ffi::enums::SioError::None => Ok(()),
             err @ _ => Err(err),
         }
     }
@@ -145,13 +145,13 @@ impl<'a> OutStream<'a> {
     ///
     /// Possible errors:
     ///
-    /// - `ffi::SioError::Streaming`
-    /// - `ffi::SioError::NoMem`
-    /// - `ffi::SioError::SystemResources`
-    /// - `ffi::SioError::BackendDisconnected`
+    /// - `ffi::enums::SioError::Streaming`
+    /// - `ffi::enums::SioError::NoMem`
+    /// - `ffi::enums::SioError::SystemResources`
+    /// - `ffi::enums::SioError::BackendDisconnected`
     pub fn start(&self) -> SioResult<()> {
         match unsafe { ffi::soundio_outstream_start(self.stream) } {
-            ffi::SioError::None => Ok(()),
+            ffi::enums::SioError::None => Ok(()),
             err @ _ => Err(err),
         }
     }
@@ -205,14 +205,14 @@ impl<'a> OutStream<'a> {
         }
     }
 
-    /// *Optional* callback. `err` is always `ffi::SioError::ErrorStreaming`.
+    /// *Optional* callback. `err` is always `ffi::enums::SioError::ErrorStreaming`.
     /// This is an unrecoverable error. The stream is in an
     /// invalid state and must be destroyed, call `OutStream::destroy`.
     /// If you do not supply `error_callback`, the default callback will print
     /// a message to stderr and then call `abort`.
     /// This is called from the `OutStream::write_callback` thread context.
     pub fn register_error_callback<E>(&mut self, callback: Box<E>)
-        where E: FnMut(OutStream, ffi::SioError) + 'a
+        where E: FnMut(OutStream, ffi::enums::SioError) + 'a
     {
         self.callbacks.error = Some(callback);
         unsafe {
@@ -243,14 +243,14 @@ impl<'a> OutStream<'a> {
                                                areas,
                                                &mut actual_frame_count as *mut c_int)
         } {
-            ffi::SioError::None => Ok(actual_frame_count),
+            ffi::enums::SioError::None => Ok(actual_frame_count),
             err @ _ => Err(err),
         }
     }
 
-    fn end_write(&self) -> Option<ffi::SioError> {
+    fn end_write(&self) -> Option<ffi::enums::SioError> {
         match unsafe { ffi::soundio_outstream_end_write(self.stream) } {
-            ffi::SioError::None => None,
+            ffi::enums::SioError::None => None,
             err @ _ => Some(err),
         }
     }
@@ -260,17 +260,17 @@ impl<'a> OutStream<'a> {
     /// This function can be called regardless of whether the outstream is paused
     /// or not.
     /// Some backends do not support clearing the buffer. On these backends this
-    /// function will return `ffi::SioError::IncompatibleBackend`.
+    /// function will return `ffi::enums::SioError::IncompatibleBackend`.
     /// Some devices do not support clearing the buffer. On these devices this
-    /// function might return `ffi::SioError::IncompatibleDevice`.
+    /// function might return `ffi::enums::SioError::IncompatibleDevice`.
     /// Possible errors:
     ///
-    /// - `ffi::SioError::Streaming`
-    /// - `ffi::SioError::IncompatibleBackend`
-    /// - `ffi::SioError::IncompatibleDevice`
-    pub fn clear_buffer(&self) -> Option<ffi::SioError> {
+    /// - `ffi::enums::SioError::Streaming`
+    /// - `ffi::enums::SioError::IncompatibleBackend`
+    /// - `ffi::enums::SioError::IncompatibleDevice`
+    pub fn clear_buffer(&self) -> Option<ffi::enums::SioError> {
         match unsafe { ffi::soundio_outstream_clear_buffer(self.stream) } {
-            ffi::SioError::None => None,
+            ffi::enums::SioError::None => None,
             err @ _ => Some(err),
         }
     }
@@ -287,15 +287,15 @@ impl<'a> OutStream<'a> {
     ///
     /// Possible errors:
     ///
-    /// - `ffi::SioError::BackendDisconnected`
-    /// - `ffi::SioError::Streaming`
-    /// - `ffi::SioError::IncompatibleDevice` - device does not support
+    /// - `ffi::enums::SioError::BackendDisconnected`
+    /// - `ffi::enums::SioError::Streaming`
+    /// - `ffi::enums::SioError::IncompatibleDevice` - device does not support
     ///   pausing/unpausing. This error code might not be returned even if the
     ///   device does not support pausing/unpausing.
-    /// - `ffi::SioError::IncompatibleBackend` - backend does not support
+    /// - `ffi::enums::SioError::IncompatibleBackend` - backend does not support
     ///   pausing/unpausing.
-    /// - `ffi::SioError::Invalid` - outstream not opened and started
-    pub fn pause(&self) -> Option<ffi::SioError> {
+    /// - `ffi::enums::SioError::Invalid` - outstream not opened and started
+    pub fn pause(&self) -> Option<ffi::enums::SioError> {
         self.stream_pause(true)
     }
 
@@ -303,26 +303,26 @@ impl<'a> OutStream<'a> {
     ///
     /// Possible errors:
     ///
-    /// - `ffi::SioError::BackendDisconnected`
-    /// - `ffi::SioError::Streaming`
-    /// - `ffi::SioError::IncompatibleDevice` - device does not support
+    /// - `ffi::enums::SioError::BackendDisconnected`
+    /// - `ffi::enums::SioError::Streaming`
+    /// - `ffi::enums::SioError::IncompatibleDevice` - device does not support
     ///   pausing/unpausing. This error code might not be returned even if the
     ///   device does not support pausing/unpausing.
-    /// - `ffi::SioError::IncompatibleBackend` - backend does not support
+    /// - `ffi::enums::SioError::IncompatibleBackend` - backend does not support
     ///   pausing/unpausing.
-    /// - `ffi::SioError::Invalid` - outstream not opened and started
-    pub fn unpause(&self) -> Option<ffi::SioError> {
+    /// - `ffi::enums::SioError::Invalid` - outstream not opened and started
+    pub fn unpause(&self) -> Option<ffi::enums::SioError> {
         self.stream_pause(false)
     }
 
-    fn stream_pause(&self, pause: bool) -> Option<ffi::SioError> {
+    fn stream_pause(&self, pause: bool) -> Option<ffi::enums::SioError> {
         let pause_c_bool = match pause {
             true => 1u8,
             false => 0u8,
         };
 
         match unsafe { ffi::soundio_outstream_pause(self.stream, pause_c_bool) } {
-            ffi::SioError::None => None,
+            ffi::enums::SioError::None => None,
             err @ _ => Some(err),
         }
     }
@@ -336,23 +336,23 @@ impl<'a> OutStream<'a> {
     ///
     /// Possible errors:
     ///
-    /// - `ffi::SioError::Streaming`
+    /// - `ffi::enums::SioError::Streaming`
     pub fn latency(&self) -> SioResult<f64> {
         let mut latency = 0.0f64;
         match unsafe {
             ffi::soundio_outstream_get_latency(self.stream, &mut latency as *mut c_double)
         } {
-            ffi::SioError::None => Ok(latency),
+            ffi::enums::SioError::None => Ok(latency),
             err @ _ => Err(err),
         }
 
     }
 
-    /// Returns the current `format` or a `ffi::SioError::Invalid` if
+    /// Returns the current `format` or a `ffi::enums::SioError::Invalid` if
     /// the format is not set.
-    pub fn format(&self) -> SioResult<ffi::SioFormat> {
+    pub fn format(&self) -> SioResult<ffi::enums::SioFormat> {
         match unsafe { (*self.stream).format } {
-            ffi::SioFormat::Invalid => Err(ffi::SioError::Invalid),
+            ffi::enums::SioFormat::Invalid => Err(ffi::enums::SioError::Invalid),
             fmt @ _ => Ok(fmt),
         }
     }
@@ -361,14 +361,14 @@ impl<'a> OutStream<'a> {
     /// **Must** be called before `open`ing the stream.
     ///
     /// If the device doesn't support the format
-    /// `ffi::SioError::IncompatibleDevice` is returned.
-    pub fn set_format(&self, format: ffi::SioFormat) -> SioResult<()> {
+    /// `ffi::enums::SioError::IncompatibleDevice` is returned.
+    pub fn set_format(&self, format: ffi::enums::SioFormat) -> SioResult<()> {
         let dev = self.device();
         if dev.supports_format(format) {
             unsafe { (*self.stream).format = format };
             Ok(())
         } else {
-            Err(ffi::SioError::IncompatibleDevice)
+            Err(ffi::enums::SioError::IncompatibleDevice)
         }
     }
 
@@ -418,7 +418,7 @@ impl<'a> OutStream<'a> {
         }
     }
 
-    /// Returns an `ffi::SioError` if the layout is incompatible
+    /// Returns an `ffi::enums::SioError` if the layout is incompatible
     /// with the audio output device.
     /// If the layout is compatible `()` is returned.
     pub fn layout_error(&self) -> SioResult<()> {

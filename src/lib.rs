@@ -26,9 +26,10 @@
 //! out.destroy();
 //! ```
 
-pub mod ffi;
+mod ffi;
 mod base;
 mod stream;
 
+pub use ffi::enums::*;
 pub use base::*;
 pub use stream::*;

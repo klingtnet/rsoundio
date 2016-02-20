@@ -6,9 +6,9 @@ use std::time::Duration;
 #[test]
 fn test_outstream() {
     let sio = rsoundio::SoundIo::new();
-    sio.connect_backend(rsoundio::ffi::SioBackend::Dummy).unwrap();
+    sio.connect_backend(rsoundio::SioBackend::Dummy).unwrap();
     let current_backend = sio.current_backend().unwrap();
-    assert_eq!(current_backend, rsoundio::ffi::SioBackend::Dummy);
+    assert_eq!(current_backend, rsoundio::SioBackend::Dummy);
     sio.flush_events();
     let dev_idx = sio.default_output_device_index().unwrap();
     let dev = sio.output_device(dev_idx).unwrap();
@@ -35,7 +35,7 @@ fn test_outstream() {
     stream.register_write_callback(Box::new(cb));
     let ucb = |_: rsoundio::OutStream| println!("Underflow!");
     stream.register_underflow_callback(Box::new(ucb));
-    let ecb = |_: rsoundio::OutStream, err: rsoundio::ffi::SioError| println!("Error: {}", err);
+    let ecb = |_: rsoundio::OutStream, err: rsoundio::SioError| println!("Error: {}", err);
     stream.register_error_callback(Box::new(ecb));
     stream.start().unwrap();
     thread::sleep(Duration::new(1, 0));
