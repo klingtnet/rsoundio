@@ -243,18 +243,18 @@ impl SoundIo {
     /// system audio mixer.
     /// Call this **before** connecting to an audio backend, otherwise
     /// the setting won't have any effect.
-    /// If the `name` contains a null byte, a `NulError` is returned.
-    /// The `:` characters in the `name` will be replaced by `_`.
-    pub fn set_app_name<T: Into<String>>(&self, name: T) -> Result<(), NulError> {
+    /// Semicolons `:` will be replaced with `_`.
+    /// If the `name` contains a `NULL` byte, `SioError::EncodingString` is returned.
+    pub fn set_app_name<T: Into<String>>(&mut self, name: T) -> SioResult<()> {
         let s = name.into().replace(":", "_");
-        self.app_name = try!(CString::new(s));
+        self.app_name = try!(CString::new(s).map_err(|_| ffi::enums::SioError::EncodingString));
         unsafe { (*self.context).app_name = self.app_name.as_ptr() };
         Ok(())
     }
 
     /// Returns the application name.
-    /// If the name is not a valid UTF-8 string a `::std::str::Utf8Error` is returned.
-    pub fn app_name(&self) -> Result<String, ::std::str::Utf8Error> {
+    /// If the name is not a valid UTF-8 string a `SioError::EncodingString` is returned.
+    pub fn app_name(&self) -> SioResult<String> {
         unsafe { ffi::utils::ptr_to_string((*self.context).app_name) }
     }
 }

@@ -395,9 +395,9 @@ impl<'a> OutStream<'a> {
     /// open the stream.
     /// WASAPI uses this for the session display name.
     /// Colons (`:`) contained in `name` will be replaced with `_`.
-    pub fn set_name<T: Into<String>>(&mut self, name: T) -> Result<(), NulError> {
+    pub fn set_name<T: Into<String>>(&mut self, name: T) -> SioResult<()> {
         let s = name.into().replace(":", "_");
-        self.name = try!(CString::new(s));
+        self.name = try!(CString::new(s).map_err(|_| ffi::enums::SioError::EncodingString));
         unsafe { (*self.stream).name = self.name.as_ptr() };
         Ok(())
     }
