@@ -10,6 +10,10 @@ macro_rules! write_stream {
         /// Expects a vector of `channel_count` channel `buffers`
         /// containing audio data that is written into
         /// the buffer of the output device.
+        /// NOTE: This is subject of change.
+        /// Passing an iterator gives more flexibility and should be more performant
+        /// in most cases.
+        ///
         /// Returns the number of actually written frames.
         /// If the provided buffers contain less frames
         /// than `min_frame_count`, or less buffers
