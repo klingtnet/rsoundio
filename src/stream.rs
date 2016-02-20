@@ -8,8 +8,8 @@ use base::*;
 macro_rules! write_stream {
     ($name:ident, $t:ty) => (
         /// Expects a vector of `channel_count` channel `buffers`
-        /// containing audio data that are written into
-        /// the output device buffer.
+        /// containing audio data that is written into
+        /// the buffer of the output device.
         /// Returns the number of actually written frames.
         /// If the provided buffers contain less frames
         /// than `min_frame_count`, or less buffers
