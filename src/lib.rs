@@ -16,7 +16,7 @@
 //! out.register_write_callback(Box::new(|out: rsoundio::OutStream, min_frame_count: i32,
 //! max_frame_count: i32| {
 //!     let frames = vec![vec![], vec![]];
-//!     // frames should contain audio data for each channel
+//!     // frames must contain audio data for each channel
 //!     out.write_stream_f32(min_frame_count, &frames).unwrap();
 //! }));
 //! out.open().unwrap();
