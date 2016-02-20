@@ -54,8 +54,7 @@ fn test_enums() {
                rsoundio::SioChannelId::FrontLeft);
     assert!(rsoundio::SioChannelId::from("SomeInvalidBoredom".to_string()) !=
             rsoundio::SioChannelId::FrontLeft);
-    assert_eq!("unsigned 8-bit",
-               format!("{}", rsoundio::SioFormat::U8));
+    assert_eq!("unsigned 8-bit", format!("{}", rsoundio::SioFormat::U8));
     assert_eq!(1, rsoundio::SioFormat::U8.bytes_per_sample());
     assert_eq!(4, rsoundio::SioFormat::U32LE.bytes_per_sample());
 }

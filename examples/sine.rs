@@ -47,8 +47,7 @@ fn main() {
     out.register_underflow_callback(Box::new(|out: rsoundio::OutStream| {
         println!("Underflow in {} occured!", out.name().unwrap())
     }));
-    out.register_error_callback(Box::new(|out: rsoundio::OutStream,
-                                          err: rsoundio::SioError| {
+    out.register_error_callback(Box::new(|out: rsoundio::OutStream, err: rsoundio::SioError| {
         println!("{} error: {}", out.name().unwrap(), err)
     }));
 
