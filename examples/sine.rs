@@ -14,7 +14,7 @@ fn main() {
                                 .collect();
     // create an audio context
     let mut sio = rsoundio::SoundIo::new();
-    sio.set_app_name("rsoundio-example").unwrap();
+    sio.set_name("rsoundio-example").unwrap();
     // connect to the default audio backend
     sio.connect().unwrap();
     println!("Connected to backend: {}", sio.current_backend().unwrap());

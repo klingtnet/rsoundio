@@ -12,13 +12,13 @@ pub type SioResult<T> = Result<T, ffi::enums::SioError>;
 /// and provides methods to get in-/output `Device`s.
 pub struct SoundIo {
     context: *mut ffi::SoundIo,
-    app_name: CString,
+    name: CString,
 }
 impl SoundIo {
     pub fn new() -> Self {
         SoundIo {
             context: unsafe { ffi::soundio_create() },
-            app_name: CString::new("rsoundio").unwrap(),
+            name: CString::new("rsoundio").unwrap(),
         }
     }
 
@@ -245,16 +245,16 @@ impl SoundIo {
     /// the setting won't have any effect.
     /// Semicolons `:` will be replaced with `_`.
     /// If the `name` contains a `NULL` byte, `SioError::EncodingString` is returned.
-    pub fn set_app_name<T: Into<String>>(&mut self, name: T) -> SioResult<()> {
+    pub fn set_name<T: Into<String>>(&mut self, name: T) -> SioResult<()> {
         let s = name.into().replace(":", "_");
-        self.app_name = try!(CString::new(s).map_err(|_| ffi::enums::SioError::EncodingString));
-        unsafe { (*self.context).app_name = self.app_name.as_ptr() };
+        self.name = try!(CString::new(s).map_err(|_| ffi::enums::SioError::EncodingString));
+        unsafe { (*self.context).app_name = self.name.as_ptr() };
         Ok(())
     }
 
     /// Returns the application name.
     /// If the name is not a valid UTF-8 string a `SioError::EncodingString` is returned.
-    pub fn app_name(&self) -> SioResult<String> {
+    pub fn name(&self) -> SioResult<String> {
         unsafe { ffi::utils::ptr_to_string((*self.context).app_name) }
     }
 }
