@@ -1,6 +1,6 @@
 use std::os::raw::{c_int, c_double, c_void};
 use std::{ptr, slice};
-use std::ffi::{CString, NulError};
+use std::ffi::CString;
 
 use ffi;
 use base::*;
