@@ -4,7 +4,10 @@ This is a work in progress.
 
 ## TODOs
 
-- [ ] add documentation
+- [x] add documentation
 - [ ] implement `InStream`
+- [ ] implement remaining callback registrations for `SoundIo` struct
+- [ ] let `write_stream_FMT` accept an iterator instead of a `Vec<Vec<FMT>>`
+- [ ] make `rsoundio::ffi` private and only export the enums
 - [ ] publish on crates.io
 - [ ] write examples
