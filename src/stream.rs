@@ -395,6 +395,7 @@ impl<'a> OutStream<'a> {
     /// open the stream.
     /// WASAPI uses this for the session display name.
     /// Colons (`:`) contained in `name` will be replaced with `_`.
+    /// If the `name` contains a `NULL` byte, `SioError::EncodingString` is returned.
     pub fn set_name<T: Into<String>>(&mut self, name: T) -> SioResult<()> {
         let s = name.into().replace(":", "_");
         self.name = try!(CString::new(s).map_err(|_| ffi::enums::SioError::EncodingString));
