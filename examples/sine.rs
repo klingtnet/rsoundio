@@ -57,7 +57,6 @@ fn main() {
     let sr = out.sample_rate();
     println!("Sample rate: {}", sr);
 
-    //out.layout_error().unwrap();
     let layout = out.layout();
     println!("Output channel layout: {}", layout);
     // start audio output (now the `write_callback` will be called periodically)
