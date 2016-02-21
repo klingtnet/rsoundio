@@ -2,6 +2,8 @@ language: rust
 matrix:
     include:
         - env: CC_X=gcc-4.8 CXX_X=g++-4.8
+          os: linux
+          rust: stable
           addons:
               apt:
                   packages:
