@@ -1,11 +1,11 @@
 language: rust
 rust:
-	- stable
-	- beta
-	- nightly
+    - stable
+    - beta
+    - nightly
 compiler: gcc
 env:
-	global:
+    global:
         - CC_X=gcc-4.8
 addons:
   apt:
