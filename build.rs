@@ -83,6 +83,9 @@ fn build(target: String) {
     let build_dir = soundio_root.join("build");
     fs::create_dir(&build_dir).unwrap();
 
+    let cc = env::var("MAKE_C_COMPILER").unwrap();
+    let cxx = env::var("MAKE_CXX_COMPILER").unwrap();
+
     // run cmake
     cmake::Config::new(&soundio_root)
         .define("CMAKE_BUILD_TYPE", "Release")
@@ -92,6 +95,8 @@ fn build(target: String) {
         .define("BUILD_TESTS", "OFF")
         .define("BUILD_STATIC_LIBS", "ON")
         .define("ENABLE_JACK", "OFF")
+        .define("MAKE_C_COMPILER", cc)
+        .define("MAKE_CXX_COMPILER", cxx)
         .build();
 
     // make install
