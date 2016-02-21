@@ -4,5 +4,7 @@ rust:
     - beta
     - nightly
 matrix:
+    include:
+        - env: CC_X=gcc-4.6 CXX_X=g++-4.6
     allow_failures:
         - rust: nightly
