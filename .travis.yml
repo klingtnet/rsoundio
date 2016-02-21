@@ -3,17 +3,16 @@ rust:
     - stable
     - beta
     - nightly
-compiler: gcc
 env:
     global:
         - CC_X=gcc-4.8
-        - CMAKE_CXX_COMPILER=gcc
+        - CMAKE_C_COMPILER=gcc
+        - CMAKE_CXX_COMPILER=g++
 addons:
   apt:
-    sources:
-      - ubuntu-toolchain-r-test
     packages:
       - gcc-4.8
+      - g++-4.8
 matrix:
     allow_failures:
         - rust: nightly
