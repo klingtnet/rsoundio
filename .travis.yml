@@ -7,6 +7,7 @@ compiler: gcc
 env:
     global:
         - CC_X=gcc-4.8
+        - CMAKE_CXX_COMPILER=gcc
 addons:
   apt:
     sources:
