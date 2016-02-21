@@ -1,12 +1,18 @@
 language: rust
+rust:
+	- stable
+	- beta
+	- nightly
+compiler: gcc
+env:
+	global:
+        - CC_X=gcc-4.8
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-4.8
 matrix:
-    include:
-        - env: CC_X=gcc-4.8 CXX_X=g++-4.8
-          os: linux
-          rust: stable
-          addons:
-              apt:
-                  packages:
-                    - gcc-4.8
     allow_failures:
         - rust: nightly
