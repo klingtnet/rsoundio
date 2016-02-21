@@ -11,10 +11,12 @@ env:
         - CMAKE_C_COMPILER=gcc
         - CMAKE_CXX_COMPILER=g++
 addons:
-  apt:
-    packages:
-      - gcc-4.7
-      - g++-4.7
+    apt:
+      sources:
+        - ubuntu-toolchain-r-test
+      packages:
+        - gcc-4.8
+        - g++-4.8
 matrix:
     allow_failures:
         - rust: nightly
