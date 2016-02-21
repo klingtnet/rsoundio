@@ -1,6 +1,10 @@
 language: rust
 matrix:
     include:
-        - env: CC_X=gcc-4.6 CXX_X=g++-4.6
+        - env: CC_X=gcc-4.8 CXX_X=g++-4.8
+          addons:
+              apt:
+                  packages:
+                    - gcc-4.8
     allow_failures:
         - rust: nightly
