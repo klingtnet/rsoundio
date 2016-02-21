@@ -13,8 +13,8 @@ env:
 addons:
   apt:
     packages:
-      - gcc-4.8
-      - g++-4.8
+      - gcc-4.7
+      - g++-4.7
 matrix:
     allow_failures:
         - rust: nightly
