@@ -8,5 +8,11 @@ documentation = "https://docs.klingt.net/rustdoc/rsoundio"
 repository = "https://git.klingt.net/alinz/rsoundio"
 license = "GPL-3.0"
 readme = "README.md"
+links = "soundio"
+build = "build.rs"
 
 [dependencies]
+
+[build-dependencies]
+cmake = "0.1.13"
+pkg-config = "0.3.7"
