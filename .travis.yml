@@ -3,8 +3,7 @@ rust:
     - stable
     - beta
     - nightly
-before-install:
-    - gcc --version
+sudo: required
 env:
     global:
         - CC_X=gcc-4.8
