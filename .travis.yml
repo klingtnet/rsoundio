@@ -1,21 +1,18 @@
+sudo: false
 language: rust
 rust:
-    - stable
-    - beta
-    - nightly
-sudo: required
+  - stable
+  - beta
+  - nightly
 env:
-    global:
-        - CC_X=gcc-4.8
-        - CMAKE_C_COMPILER=gcc
-        - CMAKE_CXX_COMPILER=g++
+  - CXX=g++-4.8
 addons:
-    apt:
-      sources:
-        - ubuntu-toolchain-r-test
-      packages:
-        - gcc-4.8
-        - g++-4.8
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-4.8
+      - g++-4.8
 matrix:
     allow_failures:
         - rust: nightly
