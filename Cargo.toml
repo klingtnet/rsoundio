@@ -6,7 +6,7 @@ description = "libsoundio bindings for Rust"
 keywords = ["audio", "stream", "recording"]
 documentation = "https://docs.klingt.net/rustdoc/rsoundio"
 repository = "https://git.klingt.net/alinz/rsoundio"
-license-file = "LICENSE"
+license = "GPL-3.0"
 readme = "README.md"
 
 [dependencies]
