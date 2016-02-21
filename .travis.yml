@@ -5,8 +5,8 @@ rust:
   - beta
   - nightly
 env:
-  - CC=/usr/bin/gcc
-  - CXX=/usr/bin/g++
+  - CC=/usr/bin/gcc-4.8
+  - CXX=/usr/bin/g++-4.8
 addons:
   apt:
     sources:
