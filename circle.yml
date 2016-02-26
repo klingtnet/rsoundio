@@ -1,6 +1,6 @@
 dependencies:
     post:
-        - curl -Lsf https://raw.githubusercontent.com/brson/multirust/master/blastoff.sh | sh
+        - curl -Lsf https://raw.githubusercontent.com/brson/multirust/master/blastoff.sh | sh -s -- --yes
         - multirust default stable
 test:
     override:
