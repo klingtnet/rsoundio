@@ -1,0 +1,6 @@
+dependencies:
+    post:
+        - curl -Lsf https://static.rust-lang.org/rustup.sh | sh - --channel=stable --yes
+test:
+    override:
+        - cargo test
