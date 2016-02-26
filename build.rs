@@ -104,5 +104,5 @@ fn build(target: String) {
         .unwrap();
 
     // remove builddir
-    fs::remove_dir_all(soundio_root).unwrap();
+    fs::remove_dir_all(build_dir).unwrap();
 }
