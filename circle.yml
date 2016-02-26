@@ -1,6 +1,7 @@
 dependencies:
     post:
-        - curl -Lsf https://static.rust-lang.org/rustup.sh | sh - --channel=stable --yes
+        - curl -Lsf https://raw.githubusercontent.com/brson/multirust/master/blastoff.sh | sh
+        - multirust default stable
 test:
     override:
         - cargo test
