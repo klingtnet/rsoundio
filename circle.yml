@@ -5,4 +5,4 @@ dependencies:
         - multirust default stable
 test:
     override:
-        - cargo test
+        - eval `ssh-agent` && ssh-add /home/ubuntu/.ssh/id_circleci_github && cargo test
