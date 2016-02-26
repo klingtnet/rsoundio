@@ -1,4 +1,3 @@
-extern crate cmake;
 extern crate pkg_config;
 use std::process::Command;
 use std::path::PathBuf;
@@ -84,15 +83,18 @@ fn build(target: String) {
     fs::create_dir(&build_dir).unwrap();
 
     // run cmake
-    cmake::Config::new(&soundio_root)
-        .define("CMAKE_BUILD_TYPE", "Release")
-        .define("CMAKE_INSTALL_LIBDIR", "lib")
-        .define("CMAKE_INSTALL_PREFIX", format!("{}", &dst_root))
-        .define("BUILD_EXAMPLE_PROGRAMS", "OFF")
-        .define("BUILD_TESTS", "OFF")
-        .define("BUILD_STATIC_LIBS", "ON")
-        .define("ENABLE_JACK", "OFF")
-        .build();
+    Command::new("cmake")
+        .current_dir(&build_dir)
+        .env("CMAKE_BUILD_TYPE", "Release")
+        .env("CMAKE_INSTALL_LIBDIR", "lib")
+        .env("CMAKE_INSTALL_PREFIX", format!("{}", &dst_root))
+        .env("BUILD_EXAMPLE_PROGRAMS", "OFF")
+        .env("BUILD_TESTS", "OFF")
+        .env("BUILD_STATIC_LIBS", "ON")
+        .env("ENABLE_JACK", "OFF")
+        .arg("..")
+        .output()
+        .unwrap();
 
     // make install
     Command::new("make")

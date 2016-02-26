@@ -14,5 +14,4 @@ build = "build.rs"
 [dependencies]
 
 [build-dependencies]
-cmake = "0.1.13"
 pkg-config = "0.3.7"
