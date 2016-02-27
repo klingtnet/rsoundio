@@ -56,12 +56,14 @@ fn build(target: String) {
     let host = env::var("HOST").unwrap();
     let dst_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let dst_root = format!("{}", &dst_dir.display());
+    let lib_dir = dst_dir.join("lib");
+    let include_dir = dst_dir.join("include");
 
     // set cargo flags
     println!("cargo:rustc-link-search={}/lib", &dst_root);
-    println!("cargo:rustc-link-lib=static={}", "soundio");
-    println!("cargo:include={}/include", &dst_root);
-    println!("cargo:root={}", &dst_root);
+    println!("cargo:rustc-link-search=native={}", &lib_dir.display()); // -L
+    println!("cargo:include={}", &include_dir.display());
+    println!("cargo:root={}", &dst_dir.display());
 
     // download and extract libsoundio source
     Command::new("curl")
