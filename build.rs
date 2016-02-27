@@ -68,7 +68,10 @@ fn main() {
 }
 
 fn sio_url(ext: &'static str) -> String {
-    format!("http://libsound.io/release/{}.{}", sio!("1.1.0"), ext)
+    match ext {
+        "tar.gz" | "zip" => format!("http://libsound.io/release/{}.{}", sio!("1.1.0"), ext),
+        _ => panic!(format!("No release for format: {}", ext)),
+    }
 }
 
 fn build(target: String) {
