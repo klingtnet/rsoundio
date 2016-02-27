@@ -80,6 +80,7 @@ fn build(target: String) {
     err_exists!(fs::create_dir(&include_dir), &include_dir.display());
 
     // set cargo flags
+    println!("cargo:rustc-link-lib=dylib={}", "soundio"); // -l
     println!("cargo:rustc-link-search=native={}", &lib_dir.display()); // -L
     println!("cargo:include={}", &include_dir.display());
     println!("cargo:root={}", &dst_dir.display());
