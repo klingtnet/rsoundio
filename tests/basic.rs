@@ -1,7 +1,13 @@
 extern crate rsoundio;
+extern crate rci;
+
+use rci::Ci;
 
 #[test]
 fn test_soundio() {
+    if Ci::new().is_some() {
+        return
+    }
     let sio = rsoundio::SoundIo::new();
     assert!(sio.backend_count() > 0);
     assert!(sio.backend(0).is_some());
