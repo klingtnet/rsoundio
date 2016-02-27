@@ -1,5 +1,7 @@
 # A Rusty Wrapper for [libsoundio](http://libsound.io)
 
+[![Circle CI](https://circleci.com/gh/klingtnet/rsoundio.svg?style=svg)](https://circleci.com/gh/klingtnet/rsoundio)
+
 Rsoundio is a wrapper for [libsoundio](https://github.com/andrewrk/libsoundio), a cross-platform realtime audio in- and output library.
 
 The following backens are supported:
