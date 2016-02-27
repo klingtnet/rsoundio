@@ -4,8 +4,13 @@ dependencies:
         - curl -Lsf https://raw.githubusercontent.com/brson/multirust/master/blastoff.sh | sh -s -- --yes
         - multirust default stable
 test:
+    pre:
+        - >
+            eval $(ssh-agent) &&
+            ssh-add /home/ubuntu/.ssh/id_circleci_github &&
+            cargo build
     override:
         - >
             eval $(ssh-agent) &&
             ssh-add /home/ubuntu/.ssh/id_circleci_github &&
-            eval $(LD_LIBRARY_PATH="$(dirname $(find -iname libsoundio.so.1))") cargo test
+            LD_LIBRARY_PATH="$(dirname $(find -iname libsoundio.so.1))" cargo test
