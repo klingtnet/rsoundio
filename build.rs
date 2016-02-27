@@ -4,6 +4,24 @@ use std::path::PathBuf;
 use std::env;
 use std::fs;
 
+macro_rules! sio {
+    ($expr:expr) => { format!("libsoundio-{}", $expr) }
+}
+
+macro_rules! err_exists {
+    ($expr:expr, $msg:expr) => {
+        match $expr {
+            Ok(val) => val,
+            Err(err) => {
+                match err.kind() {
+                    ::std::io::ErrorKind::AlreadyExists => (),
+                    _ => panic!(format!("{}: {}", $msg, err)),
+                }
+            }
+        }
+    }
+}
+
 fn lib_available(name: &str) -> bool {
     match pkg_config::find_library(name) {
         Ok(_) => true,
@@ -49,49 +67,60 @@ fn main() {
     }
 }
 
-const LIBSOUNDIO_TAR: &'static str = "http://libsound.io/release/libsoundio-1.1.0.tar.gz";
-const LIBSOUNDIO_WIN: &'static str = "http://libsound.io/release/libsoundio-1.1.0.zip";
+fn sio_url(ext: &'static str) -> String {
+    match ext {
+        "tar.gz" | "zip" => format!("http://libsound.io/release/{}.{}", sio!("1.1.0"), ext),
+        _ => panic!(format!("No release for format: {}", ext)),
+    }
+}
 
 fn build(target: String) {
     let host = env::var("HOST").unwrap();
     let dst_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
-    let dst_root = format!("{}", &dst_dir.display());
+    let lib_dir = dst_dir.join("lib");
+    let include_dir = dst_dir.join("include");
+    err_exists!(fs::create_dir(&lib_dir), &lib_dir.display());
+    err_exists!(fs::create_dir(&include_dir), &include_dir.display());
 
     // set cargo flags
-    println!("cargo:rustc-link-search={}/lib", &dst_root);
-    println!("cargo:rustc-link-lib=static={}", "soundio");
-    println!("cargo:include={}/include", &dst_root);
-    println!("cargo:root={}", &dst_root);
+    println!("cargo:rustc-link-lib=dylib={}", "soundio"); // -l
+    println!("cargo:rustc-link-search=native={}", &lib_dir.display()); // -L
+    println!("cargo:include={}", &include_dir.display());
+    println!("cargo:root={}", &dst_dir.display());
 
     // download and extract libsoundio source
     Command::new("curl")
         .current_dir(&dst_dir)
         .args(&["--location", "--remote-name"])
-        .arg(LIBSOUNDIO_TAR)
+        .arg(sio_url("tar.gz"))
         .output()
         .unwrap();
     Command::new("tar")
         .current_dir(&dst_dir)
         .arg("-xvzf")
-        .arg("libsoundio-1.1.0.tar.gz")
+        .arg(format!("{}.{}", sio!("1.1.0"), "tar.gz"))
         .output()
         .unwrap();
 
     // create build dir
-    let soundio_root = dst_dir.join("libsoundio-1.1.0");
+    let soundio_root = dst_dir.join(sio!("1.1.0"));
     let build_dir = soundio_root.join("build");
-    fs::create_dir(&build_dir).unwrap();
+    err_exists!(fs::create_dir(&build_dir), &build_dir.display());
 
+    // TODO:set build type to release for env var PROFILE={release,bench}
     // run cmake
     Command::new("cmake")
         .current_dir(&build_dir)
-        .env("CMAKE_BUILD_TYPE", "Release")
-        .env("CMAKE_INSTALL_LIBDIR", "lib")
-        .env("CMAKE_INSTALL_PREFIX", format!("{}", &dst_root))
-        .env("BUILD_EXAMPLE_PROGRAMS", "OFF")
-        .env("BUILD_TESTS", "OFF")
-        .env("BUILD_STATIC_LIBS", "ON")
-        .env("ENABLE_JACK", "OFF")
+        .arg("-DCMAKE_BUILD_TYPE=Debug")
+        .arg("-DCMAKE_INSTALL_LIBDIR:PATH=lib")
+        .arg(format!("-DCMAKE_INSTALL_PREFIX:PATH={}", &dst_dir.display()))
+        .arg("-DBUILD_EXAMPLE_PROGRAMS:BOOL=OFF")
+        .arg("-DBUILD_TESTS:BOOL=OFF")
+        .arg("-DBUILD_STATIC_LIBS:BOOL=OFF")
+        .arg("-DBUILD_SHARED_LIBS:BOOL=ON")
+        .arg("-DENABLE_JACK:BOOL=OFF")
+        .arg("-DENABLE_PULSEAUDIO:BOOL=OFF")
+        .arg("-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON")
         .arg("..")
         .output()
         .unwrap();

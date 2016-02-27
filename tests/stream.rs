@@ -1,10 +1,16 @@
 extern crate rsoundio;
+extern crate rci;
+
+use rci::Ci;
 
 use std::thread;
 use std::time::Duration;
 
 #[test]
 fn test_outstream() {
+    if Ci::new().is_some() {
+        return
+    }
     let sio = rsoundio::SoundIo::new();
     sio.connect_backend(rsoundio::SioBackend::Dummy).unwrap();
     let current_backend = sio.current_backend().unwrap();
@@ -45,5 +51,4 @@ fn test_outstream() {
     assert!(stream.clear_buffer().is_none());
     thread::sleep(Duration::new(1, 0));
     stream.destroy();
-    dev.dec_ref();
 }
