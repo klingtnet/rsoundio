@@ -4,6 +4,20 @@ use std::path::PathBuf;
 use std::env;
 use std::fs;
 
+macro_rules! err_exists {
+    ($expr:expr, $msg:expr) => {
+        match $expr {
+            Ok(val) => val,
+            Err(err) => {
+                match err.kind() {
+                    ::std::io::ErrorKind::AlreadyExists => (),
+                    _ => panic!(format!("{}: {}", $msg, err)),
+                }
+            }
+        }
+    }
+}
+
 fn lib_available(name: &str) -> bool {
     match pkg_config::find_library(name) {
         Ok(_) => true,
@@ -57,6 +71,8 @@ fn build(target: String) {
     let dst_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let lib_dir = dst_dir.join("lib");
     let include_dir = dst_dir.join("include");
+    err_exists!(fs::create_dir(&lib_dir), &lib_dir.display());
+    err_exists!(fs::create_dir(&include_dir), &include_dir.display());
 
     // set cargo flags
     println!("cargo:rustc-link-search=native={}", &lib_dir.display()); // -L
@@ -80,7 +96,7 @@ fn build(target: String) {
     // create build dir
     let soundio_root = dst_dir.join("libsoundio-1.1.0");
     let build_dir = soundio_root.join("build");
-    fs::create_dir(&build_dir).unwrap();
+    err_exists!(fs::create_dir(&build_dir), &build_dir.display());
 
     // run cmake
     Command::new("cmake")
