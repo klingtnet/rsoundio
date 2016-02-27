@@ -4,6 +4,10 @@ use std::path::PathBuf;
 use std::env;
 use std::fs;
 
+macro_rules! sio {
+    ($expr:expr) => { format!("libsoundio-{}", $expr) }
+}
+
 macro_rules! err_exists {
     ($expr:expr, $msg:expr) => {
         match $expr {
@@ -63,8 +67,9 @@ fn main() {
     }
 }
 
-const LIBSOUNDIO_TAR: &'static str = "http://libsound.io/release/libsoundio-1.1.0.tar.gz";
-const LIBSOUNDIO_WIN: &'static str = "http://libsound.io/release/libsoundio-1.1.0.zip";
+fn sio_url(ext: &'static str) -> String {
+    format!("http://libsound.io/release/{}.{}", sio!("1.1.0"), ext)
+}
 
 fn build(target: String) {
     let host = env::var("HOST").unwrap();
@@ -83,18 +88,18 @@ fn build(target: String) {
     Command::new("curl")
         .current_dir(&dst_dir)
         .args(&["--location", "--remote-name"])
-        .arg(LIBSOUNDIO_TAR)
+        .arg(sio_url("tar.gz"))
         .output()
         .unwrap();
     Command::new("tar")
         .current_dir(&dst_dir)
         .arg("-xvzf")
-        .arg("libsoundio-1.1.0.tar.gz")
+        .arg(format!("{}.{}", sio!("1.1.0"), "tar.gz"))
         .output()
         .unwrap();
 
     // create build dir
-    let soundio_root = dst_dir.join("libsoundio-1.1.0");
+    let soundio_root = dst_dir.join(sio!("1.1.0"));
     let build_dir = soundio_root.join("build");
     err_exists!(fs::create_dir(&build_dir), &build_dir.display());
 
