@@ -8,4 +8,4 @@ test:
         - >
             eval `ssh-agent` &&
             ssh-add /home/ubuntu/.ssh/id_circleci_github &&
-            LD_LIBRARY_PATH="$(dirname $(find -iname libsoundio.so.1))" cargo test
+            LD_LIBRARY_PATH="`dirname `find -iname libsoundio.so.1``" cargo test
