@@ -21,6 +21,15 @@ Most of the input stream implementation can be copied from the output stream tho
 
 - [documentation](https://docs.klingt.net/rustdoc/rsoundio/)
 
+## Usage
+
+Add it to the `dependencies` section of your projects `Cargo.toml`
+
+```toml
+[dependencies]
+rsoundio = "0.1.*"
+```
+
 ## Example
 
 `cargo run --example sine`
