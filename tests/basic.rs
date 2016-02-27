@@ -5,7 +5,6 @@ fn test_soundio() {
     let sio = rsoundio::SoundIo::new();
     assert!(sio.backend_count() > 0);
     assert!(sio.backend(0).is_some());
-    assert!(sio.backend(-1).is_none());
     sio.connect().unwrap();
     sio.disconnect();
     if sio.have_backend(rsoundio::SioBackend::Alsa) {
