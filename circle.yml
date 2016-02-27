@@ -6,6 +6,6 @@ dependencies:
 test:
     override:
         - >
-            eval `ssh-agent` &&
+            eval $(ssh-agent) &&
             ssh-add /home/ubuntu/.ssh/id_circleci_github &&
-            LD_LIBRARY_PATH="`dirname `find -iname libsoundio.so.1``" cargo test
+            eval $(LD_LIBRARY_PATH="$(dirname $(find -iname libsoundio.so.1))") cargo test
