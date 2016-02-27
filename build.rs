@@ -107,6 +107,7 @@ fn build(target: String) {
     let build_dir = soundio_root.join("build");
     err_exists!(fs::create_dir(&build_dir), &build_dir.display());
 
+    // TODO:set build type to release for env var PROFILE={release,bench}
     // run cmake
     Command::new("cmake")
         .current_dir(&build_dir)
