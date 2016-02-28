@@ -370,14 +370,14 @@ impl Device {
 
     // ref is a keyword
     /// Add 1 to the reference count of `device`.
-    pub fn inc_ref(&self) {
+    fn inc_ref(&self) {
         unsafe { ffi::soundio_device_ref(self.device) }
     }
 
     // Called automatically on `Device` drop.
     /// Remove 1 to the reference count of `device`. Clean up if it was the last
     /// reference.
-    pub fn dec_ref(&self) {
+    fn dec_ref(&self) {
         unsafe { ffi::soundio_device_unref(self.device) }
     }
 
