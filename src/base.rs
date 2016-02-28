@@ -465,8 +465,4 @@ impl PartialEq for Device {
     fn eq(&self, other: &Self) -> bool {
         unsafe { ffi::soundio_device_equal(self.device, other.device) == 1u8 }
     }
-
-    fn ne(&self, other: &Self) -> bool {
-        !self.eq(other)
-    }
 }
