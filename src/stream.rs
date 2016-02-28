@@ -47,8 +47,7 @@ macro_rules! write_stream {
     )
 }
 
-extern "C" fn write_wrapper<W>(raw_out: *mut ffi::SoundIoOutStream, min: c_int, max: c_int)
-    where W: FnMut(OutStream, u32, u32)
+extern "C" fn write_wrapper(raw_out: *mut ffi::SoundIoOutStream, min: c_int, max: c_int)
 {
     let out = OutStream::new(raw_out);
     let callbacks_ptr = unsafe { (*out.stream).userdata as *mut Box<OutStreamCallbacks> };
@@ -56,8 +55,7 @@ extern "C" fn write_wrapper<W>(raw_out: *mut ffi::SoundIoOutStream, min: c_int, 
     callbacks.write.as_mut().map(|f| f(out, min as u32, max as u32));
 }
 
-extern "C" fn underflow_wrapper<U>(raw_out: *mut ffi::SoundIoOutStream)
-    where U: FnMut(OutStream)
+extern "C" fn underflow_wrapper(raw_out: *mut ffi::SoundIoOutStream)
 {
     let out = OutStream::new(raw_out);
     let callbacks_ptr = unsafe { (*out.stream).userdata as *mut Box<OutStreamCallbacks> };
@@ -65,8 +63,7 @@ extern "C" fn underflow_wrapper<U>(raw_out: *mut ffi::SoundIoOutStream)
     callbacks.underflow.as_mut().map(|f| f(out));
 }
 
-extern "C" fn error_wrapper<E>(raw_out: *mut ffi::SoundIoOutStream, error: ffi::enums::SioError)
-    where E: FnMut(OutStream, ffi::enums::SioError)
+extern "C" fn error_wrapper(raw_out: *mut ffi::SoundIoOutStream, error: ffi::enums::SioError)
 {
     let out = OutStream::new(raw_out);
     let callbacks_ptr = unsafe { (*out.stream).userdata as *mut Box<OutStreamCallbacks> };
@@ -181,7 +178,7 @@ impl<'a> OutStream<'a> {
         self.callbacks.write = Some(Box::new(callback));
         unsafe {
             // register wrapper for write_callback
-            (*self.stream).write_callback = Some(write_wrapper::<W>);
+            (*self.stream).write_callback = Some(write_wrapper);
             // store reference to callbacks struct in userdata pointer
             (*self.stream).userdata =
                 &self.callbacks as *const Box<OutStreamCallbacks> as *mut c_void
@@ -198,7 +195,7 @@ impl<'a> OutStream<'a> {
         self.callbacks.underflow = Some(Box::new(callback));
         unsafe {
             // register wrapper for write_callback
-            (*self.stream).underflow_callback = Some(underflow_wrapper::<U>);
+            (*self.stream).underflow_callback = Some(underflow_wrapper);
             // store reference to callbacks struct in userdata pointer
             (*self.stream).userdata =
                 &self.callbacks as *const Box<OutStreamCallbacks> as *mut c_void
@@ -217,7 +214,7 @@ impl<'a> OutStream<'a> {
         self.callbacks.error = Some(Box::new(callback));
         unsafe {
             // register wrapper for write_callback
-            (*self.stream).error_callback = Some(error_wrapper::<E>);
+            (*self.stream).error_callback = Some(error_wrapper);
             // store reference to callbacks struct in userdata pointer
             (*self.stream).userdata =
                 &self.callbacks as *const Box<OutStreamCallbacks> as *mut c_void
