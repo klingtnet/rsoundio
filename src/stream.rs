@@ -19,7 +19,7 @@ macro_rules! write_stream {
         /// than `min_frame_count`, or less buffers
         /// as `channel_count` are provided,
         /// then a `ffi::enums::SioError::Invalid` is returned.
-        pub fn $name(&self, min_frame_count: i32, buffers: &Vec<Vec<$t>>) -> SioResult<i32> {
+        pub fn $name(&self, min_frame_count: u32, buffers: &Vec<Vec<$t>>) -> SioResult<u32> {
             let channel_count = self.layout().channel_count();
             // check if buffer contains frames for all channels
             if buffers.len() < channel_count as usize {
@@ -48,12 +48,12 @@ macro_rules! write_stream {
 }
 
 extern "C" fn write_wrapper<W>(raw_out: *mut ffi::SoundIoOutStream, min: c_int, max: c_int)
-    where W: FnMut(OutStream, i32, i32)
+    where W: FnMut(OutStream, u32, u32)
 {
     let out = OutStream::new(raw_out);
     let callbacks_ptr = unsafe { (*out.stream).userdata as *mut Box<OutStreamCallbacks> };
     let callbacks: &mut Box<OutStreamCallbacks> = unsafe { &mut *callbacks_ptr };
-    callbacks.write.as_mut().map(|f| f(out, min as i32, max as i32));
+    callbacks.write.as_mut().map(|f| f(out, min as u32, max as u32));
 }
 
 extern "C" fn underflow_wrapper<U>(raw_out: *mut ffi::SoundIoOutStream)
@@ -75,7 +75,7 @@ extern "C" fn error_wrapper<E>(raw_out: *mut ffi::SoundIoOutStream, error: ffi::
 }
 
 struct OutStreamCallbacks<'a> {
-    write: Option<Box<FnMut(OutStream, i32, i32) + 'a>>,
+    write: Option<Box<FnMut(OutStream, u32, u32) + 'a>>,
     underflow: Option<Box<FnMut(OutStream) + 'a>>,
     error: Option<Box<FnMut(OutStream, ffi::enums::SioError) + 'a>>,
 }
@@ -175,7 +175,7 @@ impl<'a> OutStream<'a> {
     /// malloc, free, printf, pthread_mutex_lock, sleep, wait, poll, select,
     /// pthread_join, pthread_cond_wait, etc.
     pub fn register_write_callback<W>(&mut self, callback: Box<W>)
-        where W: FnMut(OutStream, i32, i32) + 'a
+        where W: FnMut(OutStream, u32, u32) + 'a
     {
         // stored box reference to callback closure
         self.callbacks.write = Some(callback);
@@ -235,15 +235,15 @@ impl<'a> OutStream<'a> {
 
     fn begin_write(&self,
                    areas: *mut *mut ffi::SoundIoChannelArea,
-                   frame_count: &i32)
-                   -> SioResult<i32> {
+                   frame_count: &c_int)
+                   -> SioResult<u32> {
         let mut actual_frame_count = *frame_count as c_int;
         match unsafe {
             ffi::soundio_outstream_begin_write(self.stream,
                                                areas,
                                                &mut actual_frame_count as *mut c_int)
         } {
-            ffi::enums::SioError::None => Ok(actual_frame_count),
+            ffi::enums::SioError::None => Ok(actual_frame_count as u32),
             err @ _ => Err(err),
         }
     }
@@ -378,8 +378,8 @@ impl<'a> OutStream<'a> {
     }
 
     /// Returns the sample rate of the output stream.
-    pub fn sample_rate(&self) -> i32 {
-        unsafe { (*self.stream).sample_rate as i32 }
+    pub fn sample_rate(&self) -> u32 {
+        unsafe { (*self.stream).sample_rate as u32 }
     }
 
     /// Returns the underlying device of the output stream.

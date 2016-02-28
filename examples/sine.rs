@@ -31,8 +31,8 @@ fn main() {
 
     // register callbacks
     out.register_write_callback(Box::new(|out: rsoundio::OutStream,
-                                          min_frame_count: i32,
-                                          max_frame_count: i32| {
+                                          min_frame_count: u32,
+                                          max_frame_count: u32| {
         let l: Vec<f32> = samples.iter()
                                  .cycle()
                                  .take(max_frame_count as usize + pos)

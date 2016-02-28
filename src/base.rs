@@ -5,6 +5,8 @@ use std::ffi::CString;
 use ffi;
 use stream::OutStream;
 
+const MAX_CHANNELS: u32 = 24;
+
 /// Result wrapper that always contains a `ffi::enums::SioError` in error case.
 pub type SioResult<T> = Result<T, ffi::enums::SioError>;
 
@@ -23,13 +25,8 @@ impl SoundIo {
     }
 
     /// Returns the number builtin channel layouts.
-    pub fn channel_layout_builtin_count() -> i32 {
-        let cnt = unsafe { ffi::soundio_channel_layout_builtin_count() };
-        if cnt < 0 {
-            panic!("Negative # of builtin channel layouts!")
-        } else {
-            cnt as i32
-        }
+    pub fn channel_layout_builtin_count() -> u32 {
+        unsafe { ffi::soundio_channel_layout_builtin_count() as u32 }
     }
 
     // NOTE: Links to other types in rustdoc are not implemented
@@ -69,20 +66,15 @@ impl SoundIo {
     }
 
     /// Returns the number of available backens.
-    pub fn backend_count(&self) -> i32 {
-        let cnt = unsafe { ffi::soundio_backend_count(self.context) } as i32;
-        if cnt < 0 {
-            panic!("Negative backend count!");
-        } else {
-            cnt
-        }
+    pub fn backend_count(&self) -> u32 {
+        unsafe { ffi::soundio_backend_count(self.context) as u32 }
     }
 
     /// Returns a backend at the specified index.
     /// If the index is not in range [0, backend_count), then
     /// `None` is returned.
-    pub fn backend(&self, idx: i32) -> Option<ffi::enums::SioBackend> {
-        match unsafe { ffi::soundio_get_backend(self.context, idx) } {
+    pub fn backend(&self, idx: u32) -> Option<ffi::enums::SioBackend> {
+        match unsafe { ffi::soundio_get_backend(self.context, idx as c_int) } {
             ffi::enums::SioBackend::None => None,
             backend @ _ => Some(backend),
         }
@@ -158,26 +150,26 @@ impl SoundIo {
     /// `wait_events` to block until devices change. If an error occurs
     /// scanning devices in a background thread, `backend_disconnect` is called
     /// with the error code.
-
+    ///
     /// Get the number of input devices.
-    /// Returns -1 if you never called `flush_events`.
-    pub fn input_device_count(&self) -> Option<i32> {
+    /// Returns `None` if you never called `flush_events`.
+    pub fn input_device_count(&self) -> Option<u32> {
         let cnt = unsafe { ffi::soundio_input_device_count(self.context) };
         if cnt < 0 {
             None
         } else {
-            Some(cnt as i32)
+            Some(cnt as u32)
         }
     }
 
     /// Get the number of output devices.
-    /// Returns -1 if you never called `flush_events`.
-    pub fn output_device_count(&self) -> Option<i32> {
+    /// Returns `None` if you never called `flush_events`.
+    pub fn output_device_count(&self) -> Option<u32> {
         let cnt = unsafe { ffi::soundio_output_device_count(self.context) };
         if cnt < 0 {
             None
         } else {
-            Some(cnt as i32)
+            Some(cnt as u32)
         }
     }
 
@@ -185,8 +177,8 @@ impl SoundIo {
     /// `idx` must be in [0, `input_device_count`)
     /// Returns `None` if you never called `flush_events` or if you provide
     /// invalid parameter values.
-    pub fn input_device(&self, idx: i32) -> Option<Device> {
-        let dev_ptr = unsafe { ffi::soundio_get_input_device(self.context, idx) };
+    pub fn input_device(&self, idx: u32) -> Option<Device> {
+        let dev_ptr = unsafe { ffi::soundio_get_input_device(self.context, idx as c_int) };
         if dev_ptr.is_null() {
             None
         } else {
@@ -198,8 +190,8 @@ impl SoundIo {
     /// `idx` must be in [0, `output_device_count`)
     /// Returns `None` if you never called `flush_events` or if you provide
     /// invalid parameter values.
-    pub fn output_device(&self, idx: i32) -> Option<Device> {
-        let dev_ptr = unsafe { ffi::soundio_get_output_device(self.context, idx) };
+    pub fn output_device(&self, idx: u32) -> Option<Device> {
+        let dev_ptr = unsafe { ffi::soundio_get_output_device(self.context, idx as c_int) };
         if dev_ptr.is_null() {
             None
         } else {
@@ -207,23 +199,23 @@ impl SoundIo {
         }
     }
 
-    /// Returns the index of the default input device or `-1`
+    /// Returns the index of the default input device or `None`
     /// if there are no devices or if you never called
     /// `flush_events`.
-    pub fn default_input_device_index(&self) -> Option<i32> {
+    pub fn default_input_device_index(&self) -> Option<u32> {
         match unsafe { ffi::soundio_default_input_device_index(self.context) } {
             -1 => None,
-            idx @ _ => Some(idx as i32),
+            idx @ _ => Some(idx as u32),
         }
     }
 
-    /// Returns the index of the default output device or `-1`
+    /// Returns the index of the default output device or `None`
     /// if there are no devices or if you never called
     /// `flush_events`.
-    pub fn default_output_device_index(&self) -> Option<i32> {
+    pub fn default_output_device_index(&self) -> Option<u32> {
         match unsafe { ffi::soundio_default_output_device_index(self.context) } {
             -1 => None,
-            idx @ _ => Some(idx as i32),
+            idx @ _ => Some(idx as u32),
         }
     }
 
@@ -280,8 +272,8 @@ impl ChannelLayout {
 
     /// Returns a builtin channel layout or `None` if
     /// `idx` *not* in [0, `SoundIo::channel_layout_builtin_count`).
-    pub fn builtin(idx: i32) -> Option<Self> {
-        if 0 <= idx && idx < SoundIo::channel_layout_builtin_count() {
+    pub fn builtin(idx: u32) -> Option<Self> {
+        if idx < SoundIo::channel_layout_builtin_count() as u32 {
             Some(ChannelLayout::new(unsafe {
                 ffi::soundio_channel_layout_get_builtin(idx as c_int)
             }))
@@ -291,21 +283,21 @@ impl ChannelLayout {
     }
 
     /// Get the default builtin channel layout for the given number of channels.
-    pub fn default(channel_count: i32) -> Option<Self> {
-        if channel_count < 0 {
-            None
-        } else {
+    pub fn default(channel_count: u32) -> Option<Self> {
+        if channel_count < MAX_CHANNELS {
             Some(ChannelLayout::new(unsafe {
-                ffi::soundio_channel_layout_get_default(channel_count as i32)
+                ffi::soundio_channel_layout_get_default(channel_count as c_int)
             }))
+        } else {
+            None
         }
     }
 
     /// Return the index of `channel` in the layout, or `None` if not found.
-    pub fn find_channel(&self, channel: ffi::enums::SioChannelId) -> Option<i32> {
+    pub fn find_channel(&self, channel: ffi::enums::SioChannelId) -> Option<u32> {
         match unsafe { ffi::soundio_channel_layout_find_channel(self.layout, channel) } {
             -1 => None,
-            idx @ _ => Some(idx),
+            idx @ _ => Some(idx as u32),
         }
     }
 
@@ -346,8 +338,8 @@ impl ChannelLayout {
     }
 
     /// Returns the number of channels in the layout.
-    pub fn channel_count(&self) -> i32 {
-        unsafe { (*self.layout).channel_count as i32 }
+    pub fn channel_count(&self) -> u32 {
+        unsafe { (*self.layout).channel_count as u32 }
     }
 }
 impl PartialEq for ChannelLayout {
@@ -411,7 +403,7 @@ impl Device {
     /// Convenience function.
     /// Returns whether `sample_rate` is included in the
     /// device's supported sample rates.
-    pub fn supports_sample_rate(&self, sample_rate: i32) -> bool {
+    pub fn supports_sample_rate(&self, sample_rate: u32) -> bool {
         unsafe {
             ffi::soundio_device_supports_sample_rate(self.device, sample_rate as c_int) == 1u8
         }
@@ -420,8 +412,8 @@ impl Device {
     /// Convenience function.
     /// Returns the available sample rate nearest to
     /// `sample_rate`, rounding up.
-    pub fn nearest_sample_rate(&self, sample_rate: i32) -> i32 {
-        unsafe { ffi::soundio_device_nearest_sample_rate(self.device, sample_rate) as i32 }
+    pub fn nearest_sample_rate(&self, sample_rate: u32) -> u32 {
+        unsafe { ffi::soundio_device_nearest_sample_rate(self.device, sample_rate as c_int) as u32 }
     }
 
     /// Returns an OutStream struct with default settings.
@@ -437,8 +429,8 @@ impl Device {
     }
 
     /// Returns the number of references on this device.
-    pub fn ref_count(&self) -> i32 {
-        unsafe { (*self.device).ref_count as i32 }
+    pub fn ref_count(&self) -> u32 {
+        unsafe { (*self.device).ref_count as u32 }
     }
 
     /// This is set to a `ffi::enums::SioError` representing the result of the device

@@ -18,7 +18,6 @@ fn test_soundio() {
            .unwrap();
         sio.disconnect();
     }
-    assert!(rsoundio::SoundIo::channel_layout_builtin_count() >= 0);
     sio.connect().unwrap();
     sio.flush_events();
     assert!(sio.output_device_count().unwrap() > 0);
@@ -29,7 +28,7 @@ fn test_soundio() {
 fn test_channel_layout() {
     let cnt = rsoundio::SoundIo::channel_layout_builtin_count();
     assert!(cnt > 0);
-    assert!(rsoundio::ChannelLayout::builtin(-1).is_none());
+    assert!(rsoundio::ChannelLayout::builtin(100).is_none());
     assert_eq!(rsoundio::ChannelLayout::builtin(0),
                rsoundio::ChannelLayout::builtin(0));
     let mut layout = rsoundio::ChannelLayout::default(2).unwrap();

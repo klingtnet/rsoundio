@@ -13,8 +13,8 @@
 //! let dev = sio.default_output_device().unwrap();
 //! let mut out = dev.create_outstream().unwrap();
 //! // register write_callback
-//! out.register_write_callback(Box::new(|out: rsoundio::OutStream, min_frame_count: i32,
-//! max_frame_count: i32| {
+//! out.register_write_callback(Box::new(|out: rsoundio::OutStream, min_frame_count: u32,
+//! max_frame_count: u32| {
 //!     let frames = vec![vec![], vec![]];
 //!     // frames must contain audio data for each channel
 //!     out.write_stream_f32(min_frame_count, &frames).unwrap();
