@@ -85,9 +85,6 @@ impl<'a> Default for OutStreamCallbacks<'a> {
         }
     }
 }
-impl<'a> Drop for OutStreamCallbacks<'a> {
-    fn drop(&mut self) {}
-}
 
 /// An audio output stream, returned from a `Device`.
 pub struct OutStream<'a> {
