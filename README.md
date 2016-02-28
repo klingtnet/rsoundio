@@ -1,6 +1,6 @@
 # A Rusty Wrapper for [libsoundio](http://libsound.io)
 
-[![Circle CI](https://circleci.com/gh/klingtnet/rsoundio.svg?style=svg)](https://circleci.com/gh/klingtnet/rsoundio) [![Crates.io](https://img.shields.io/crates/v/rustc-serialize.svg)](https://crates.io/crates/rsoundio)
+[![Circle CI](https://circleci.com/gh/klingtnet/rsoundio.svg?style=svg)](https://circleci.com/gh/klingtnet/rsoundio) [![Crates.io](https://img.shields.io/crates/v/rustc-serialize.svg)](https://crates.io/crates/rsoundio) [![rustdoc](https://img.shields.io/badge/rustdoc-hosted-blue.svg)](https://docs.klingt.net/rustdoc/rsoundio)
 
 Rsoundio is a wrapper for [libsoundio](https://github.com/andrewrk/libsoundio), a cross-platform realtime audio in- and output library.
 
