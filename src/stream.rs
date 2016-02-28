@@ -174,11 +174,11 @@ impl<'a> OutStream<'a> {
     /// for a long time. This includes all I/O functions (disk, TTY, network),
     /// malloc, free, printf, pthread_mutex_lock, sleep, wait, poll, select,
     /// pthread_join, pthread_cond_wait, etc.
-    pub fn register_write_callback<W>(&mut self, callback: Box<W>)
+    pub fn register_write_callback<W>(&mut self, callback: W)
         where W: FnMut(OutStream, u32, u32) + 'a
     {
         // stored box reference to callback closure
-        self.callbacks.write = Some(callback);
+        self.callbacks.write = Some(Box::new(callback));
         unsafe {
             // register wrapper for write_callback
             (*self.stream).write_callback = Some(write_wrapper::<W>);
@@ -192,10 +192,10 @@ impl<'a> OutStream<'a> {
     /// This *optional* callback happens when the sound device runs out of buffered audio data to play.
     /// After this occurs, the outstream waits until the buffer is full to resume playback.
     /// This is called from the `OutStream::write_callback` thread context.
-    pub fn register_underflow_callback<U>(&mut self, callback: Box<U>)
+    pub fn register_underflow_callback<U>(&mut self, callback: U)
         where U: FnMut(OutStream) + 'a
     {
-        self.callbacks.underflow = Some(callback);
+        self.callbacks.underflow = Some(Box::new(callback));
         unsafe {
             // register wrapper for write_callback
             (*self.stream).underflow_callback = Some(underflow_wrapper::<U>);
@@ -211,10 +211,10 @@ impl<'a> OutStream<'a> {
     /// If you do not supply `error_callback`, the default callback will print
     /// a message to stderr and then call `abort`.
     /// This is called from the `OutStream::write_callback` thread context.
-    pub fn register_error_callback<E>(&mut self, callback: Box<E>)
+    pub fn register_error_callback<E>(&mut self, callback: E)
         where E: FnMut(OutStream, ffi::enums::SioError) + 'a
     {
-        self.callbacks.error = Some(callback);
+        self.callbacks.error = Some(Box::new(callback));
         unsafe {
             // register wrapper for write_callback
             (*self.stream).error_callback = Some(error_wrapper::<E>);

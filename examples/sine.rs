@@ -30,7 +30,7 @@ fn main() {
     println!("Output format: {}", out.format().unwrap());
 
     // register callbacks
-    out.register_write_callback(Box::new(|out: rsoundio::OutStream,
+    out.register_write_callback(|out: rsoundio::OutStream,
                                           min_frame_count: u32,
                                           max_frame_count: u32| {
         let l: Vec<f32> = samples.iter()
@@ -43,13 +43,13 @@ fn main() {
         let r = l.clone();
         let frames = vec![l, r];
         out.write_stream_f32(min_frame_count, &frames).unwrap();
-    }));
-    out.register_underflow_callback(Box::new(|out: rsoundio::OutStream| {
+    });
+    out.register_underflow_callback(|out: rsoundio::OutStream| {
         println!("Underflow in {} occured!", out.name().unwrap())
-    }));
-    out.register_error_callback(Box::new(|out: rsoundio::OutStream, err: rsoundio::SioError| {
+    });
+    out.register_error_callback(|out: rsoundio::OutStream, err: rsoundio::SioError| {
         println!("{} error: {}", out.name().unwrap(), err)
-    }));
+    });
 
     // open output stream
     out.open().unwrap();

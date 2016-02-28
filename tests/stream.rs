@@ -38,11 +38,11 @@ fn test_outstream() {
         assert!(frames_written > 0);
         assert!(out.latency().is_ok());
     };
-    stream.register_write_callback(Box::new(cb));
+    stream.register_write_callback(cb);
     let ucb = |_: rsoundio::OutStream| println!("Underflow!");
-    stream.register_underflow_callback(Box::new(ucb));
+    stream.register_underflow_callback(ucb);
     let ecb = |_: rsoundio::OutStream, err: rsoundio::SioError| println!("Error: {}", err);
-    stream.register_error_callback(Box::new(ecb));
+    stream.register_error_callback(ecb);
     stream.start().unwrap();
     thread::sleep(Duration::new(1, 0));
     assert!(stream.pause().is_none());
