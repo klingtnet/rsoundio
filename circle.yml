@@ -1,7 +1,7 @@
 dependencies:
     post:
         - sudo apt-get install -y alsa-base
-        - curl -Lsf https://raw.githubusercontent.com/brson/multirust/master/blastoff.sh | sh -s -- --yes
+        - curl -Lsf https://raw.githubusercontent.com/brson/multirust/master/quick-install.sh | sh -s -- --yes
         - multirust default stable
 test:
     pre:
