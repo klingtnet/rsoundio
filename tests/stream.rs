@@ -26,10 +26,8 @@ fn test_outstream() {
     let cb = |out: rsoundio::OutStream, min_frame_count: u32, max_frame_count: u32| {
         let l: Vec<f32> = (0..max_frame_count as usize)
                               .map(|i| {
-                                  match i % 2 == 0 {
-                                      true => -1.0,
-                                      false => 1.0,
-                                  }
+                                  (i as f32 * ((2.0 * ::std::f32::consts::PI * 440.0) / 48_000f32))
+                                      .sin()
                               })
                               .collect();
         let r = l.clone();
