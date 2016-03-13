@@ -3,6 +3,7 @@ use std::os::raw::{c_int, c_double, c_char};
 use ffi::enums::*;
 use ffi::structs::*;
 
+#[allow(dead_code)]
 #[link(name = "soundio")]
 extern "C" {
     /// Create a SoundIo context. You may create multiple instances of this to
