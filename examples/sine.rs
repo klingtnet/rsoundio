@@ -67,5 +67,4 @@ fn main() {
     println!("Unpausing");
     out.unpause();
     thread::sleep(Duration::new(3, 0));
-    out.destroy()
 }

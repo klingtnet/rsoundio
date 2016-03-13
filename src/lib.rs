@@ -23,7 +23,6 @@
 //! // start the audio stream and wait for events
 //! // out.start().unwrap();
 //! // loop { sio.wait_events(); }
-//! out.destroy();
 //! ```
 
 mod ffi;

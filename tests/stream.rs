@@ -36,7 +36,6 @@ fn test_outstream() {
         let frames = vec![l, r];
         let frames_written = out.write_stream_f32(min_frame_count, &frames).unwrap();
         assert!(frames_written > 0);
-        assert!(out.latency().is_ok());
     };
     stream.register_write_callback(cb);
     let ucb = |_: rsoundio::OutStream| println!("Underflow!");
@@ -48,7 +47,7 @@ fn test_outstream() {
     assert!(stream.pause().is_none());
     thread::sleep(Duration::new(1, 0));
     assert!(stream.unpause().is_none());
+    assert!(stream.latency().is_ok());
     assert!(stream.clear_buffer().is_none());
     thread::sleep(Duration::new(1, 0));
-    stream.destroy();
 }

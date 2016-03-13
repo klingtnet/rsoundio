@@ -47,25 +47,25 @@ macro_rules! write_stream {
     )
 }
 
-extern "C" fn write_wrapper(raw_out: *mut ffi::SoundIoOutStream, min: c_int, max: c_int)
-{
-    let out = OutStream::new(raw_out);
+extern "C" fn write_wrapper(raw_out: *mut ffi::SoundIoOutStream, min: c_int, max: c_int) {
+    let mut out = OutStream::new(raw_out);
+    out.marker = true;
     let callbacks_ptr = unsafe { (*out.stream).userdata as *mut Box<OutStreamCallbacks> };
     let callbacks: &mut Box<OutStreamCallbacks> = unsafe { &mut *callbacks_ptr };
     callbacks.write.as_mut().map(|f| f(out, min as u32, max as u32));
 }
 
-extern "C" fn underflow_wrapper(raw_out: *mut ffi::SoundIoOutStream)
-{
-    let out = OutStream::new(raw_out);
+extern "C" fn underflow_wrapper(raw_out: *mut ffi::SoundIoOutStream) {
+    let mut out = OutStream::new(raw_out);
+    out.marker = true;
     let callbacks_ptr = unsafe { (*out.stream).userdata as *mut Box<OutStreamCallbacks> };
     let callbacks: &mut Box<OutStreamCallbacks> = unsafe { &mut *callbacks_ptr };
     callbacks.underflow.as_mut().map(|f| f(out));
 }
 
-extern "C" fn error_wrapper(raw_out: *mut ffi::SoundIoOutStream, error: ffi::enums::SioError)
-{
-    let out = OutStream::new(raw_out);
+extern "C" fn error_wrapper(raw_out: *mut ffi::SoundIoOutStream, error: ffi::enums::SioError) {
+    let mut out = OutStream::new(raw_out);
+    out.marker = true;
     let callbacks_ptr = unsafe { (*out.stream).userdata as *mut Box<OutStreamCallbacks> };
     let callbacks: &mut Box<OutStreamCallbacks> = unsafe { &mut *callbacks_ptr };
     callbacks.error.as_mut().map(|f| f(out, error));
@@ -91,6 +91,7 @@ pub struct OutStream<'a> {
     stream: *mut ffi::SoundIoOutStream,
     callbacks: Box<OutStreamCallbacks<'a>>,
     name: CString,
+    marker: bool,
 }
 impl<'a> OutStream<'a> {
     pub fn new(raw_stream: *mut ffi::SoundIoOutStream) -> Self {
@@ -99,6 +100,7 @@ impl<'a> OutStream<'a> {
             stream: raw_stream,
             callbacks: callbacks,
             name: CString::new("outstream").unwrap(),
+            marker: false,
         }
     }
 
@@ -427,15 +429,20 @@ impl<'a> OutStream<'a> {
 
     /// Destroys the output stream.
     /// Calls this when your application shuts down.
-    /// NOTE: This can break if a callback is still active.
-    pub fn destroy(&self) {
+    fn destroy(&self) {
         unsafe { ffi::soundio_outstream_destroy(self.stream) }
     }
 }
 impl<'a> Drop for OutStream<'a> {
     fn drop(&mut self) {
-        // TODO: call destroy manually.
-        // OutStream will get dropped each time a new
-        // struct is created from the same *mut pointer.
+        // Only drop if usage `marker` is false.
+        // The usage marker is set by the callback function to prevent the
+        // source stream from dropping on the context switch of the callback function.
+        if !self.marker {
+            self.destroy()
+        } else {
+            // reset usage marker.
+            self.marker = false
+        }
     }
 }
