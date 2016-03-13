@@ -50,5 +50,4 @@ fn test_outstream() {
     assert!(stream.unpause().is_none());
     assert!(stream.clear_buffer().is_none());
     thread::sleep(Duration::new(1, 0));
-    stream.destroy();
 }
