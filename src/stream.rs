@@ -404,10 +404,7 @@ impl<'a> OutStream<'a> {
         if !s_ptr.is_null() {
             match ffi::utils::ptr_to_string(s_ptr) {
                 Ok(s) => Some(s),
-                Err(e) => {
-                    println!("err: {}", e);
-                    None
-                }
+                Err(_) => None,
             }
         } else {
             None
