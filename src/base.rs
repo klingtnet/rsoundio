@@ -368,7 +368,6 @@ impl Device {
         Device { device: dev_ptr }
     }
 
-    // ref is a keyword
     /// Add 1 to the reference count of `device`.
     #[allow(dead_code)]
     fn inc_ref(&self) {

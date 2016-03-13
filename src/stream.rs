@@ -108,7 +108,7 @@ impl<'a> OutStream<'a> {
     /// After you call this function, `OutStream::software_latency` is set to
     /// the correct value.
     ///
-    /// The next thing to do is call `outstream_start`.
+    /// The next thing to do is call `start`.
     /// If this function returns an error, the outstream is in an invalid state and
     /// you must call `destroy` on it.
     ///
@@ -398,7 +398,7 @@ impl<'a> OutStream<'a> {
         Ok(())
     }
 
-    /// Returns the stream name of `None` if the name wasn't set.
+    /// Returns the stream name or `None` if the name wasn't set.
     pub fn name(&self) -> Option<String> {
         let s_ptr = unsafe { (*self.stream).name };
         if !s_ptr.is_null() {
