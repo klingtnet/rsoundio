@@ -9,7 +9,7 @@ use std::time::Duration;
 #[test]
 fn test_outstream() {
     if Ci::new().is_some() {
-        return
+        ::std::process::exit(0)
     }
     let sio = rsoundio::SoundIo::new();
     sio.connect_backend(rsoundio::SioBackend::Dummy).unwrap();
