@@ -1,17 +1,14 @@
 extern crate rsoundio;
+extern crate rb;
 
-use std::f32::consts::PI;
+use rb::{RB, SpscRb, RbProducer, RbConsumer};
+use std::f32::consts::PI as PI32;
 use std::thread;
 use std::time::Duration;
 
 fn main() {
-    let f = 440f32;
-    let cycle_len = (48_000 as f32 / f) as usize;
-    let phi = 2.0 * f * PI / 48_000 as f32;
-    let mut pos = 0;
-    let samples: Vec<f32> = (pos..cycle_len)
-                                .map(|i| (phi * i as f32).sin())
-                                .collect();
+    let rb = SpscRb::new(4096);
+    let (producer, consumer) = (rb.producer(), rb.consumer());
     // create an audio context
     let mut sio = rsoundio::SoundIo::new();
     sio.set_name("rsoundio-example").unwrap();
@@ -29,19 +26,32 @@ fn main() {
     out.set_format(rsoundio::SioFormat::Float32LE).unwrap();
     println!("Output format: {}", out.format().unwrap());
 
+    thread::spawn(move || {
+        const LEN: usize = 512;
+        let mut pos = 0;
+        loop {
+            let f = 440f32;
+            let w = 2.0 * f * PI32 / 48_000.0;
+            let cycle =  (48_000f32 / f) as usize;
+
+            let samples: Vec<f32> = (0..LEN)
+                                    .map(|i| (w * (i+pos) as f32).sin())
+                                    .collect();
+            producer.write_blocking(&samples).unwrap();
+            pos = (pos + LEN) % cycle;
+        }
+    });
+
     // register callbacks
     out.register_write_callback(|out: rsoundio::OutStream,
-                                          min_frame_count: u32,
-                                          max_frame_count: u32| {
-        let l: Vec<f32> = samples.iter()
-                                 .cycle()
-                                 .take(max_frame_count as usize + pos)
-                                 .skip(pos)
-                                 .map(|s| *s)
-                                 .collect();
-        pos = (max_frame_count as usize + pos) % cycle_len;
-        let r = l.clone();
-        let frames = vec![l, r];
+                                 min_frame_count: u32,
+                                 max_frame_count: u32| {
+        let mut data = vec![0.0f32; 2048];
+        match consumer.read(&mut data) {
+            Ok(_) => (),
+            Err(err) => println!("{}", err),
+        }
+        let frames = vec![data.clone(), data.clone()];
         out.write_stream_f32(min_frame_count, &frames).unwrap();
     });
     out.register_underflow_callback(|out: rsoundio::OutStream| {

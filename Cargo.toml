@@ -18,3 +18,4 @@ pkg-config = "0.3.7"
 
 [dev-dependencies]
 rci = "0.1.*"
+rb = "^0.1"
