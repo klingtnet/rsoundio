@@ -14,7 +14,8 @@ fn main() {
     sio.set_name("rsoundio-example").unwrap();
     // connect to the default audio backend
     sio.connect().unwrap();
-    println!("Connected to backend: {}", sio.current_backend().unwrap());
+    let backend = sio.current_backend().unwrap();
+    println!("Connected to backend: {}", backend);
     sio.flush_events();
     // get default output device
     let dev = sio.default_output_device().unwrap();
@@ -46,9 +47,16 @@ fn main() {
     out.register_write_callback(|out: rsoundio::OutStream,
                                  min_frame_count: u32,
                                  max_frame_count: u32| {
-        let mut data = vec![0.0f32; 2048];
-        consumer.read_blocking(&mut data);
-        let frames = vec![data.clone(), data.clone()];
+        const BUF_SIZE: usize = 2048;
+        let mut data = vec![0.0f32; BUF_SIZE];
+        let len = if backend != rsoundio::SioBackend::PulseAudio {
+            ::std::cmp::min(BUF_SIZE, max_frame_count as usize)
+        } else {
+            BUF_SIZE
+        };
+        consumer.read_blocking(&mut data[..len]);
+        let frames = vec![data[..len].iter().cloned().collect(),
+                          data[..len].iter().cloned().collect()];
         out.write_stream_f32(min_frame_count, &frames).unwrap();
     });
     out.register_underflow_callback(|out: rsoundio::OutStream| {
