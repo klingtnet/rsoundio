@@ -72,6 +72,10 @@ fn main() {
     let sr = out.sample_rate();
     println!("Sample rate: {}", sr);
 
+    match out.latency() {
+        Ok(latency) => println!("SW latency: {}", latency),
+        Err(err) => println!("err: {}", err),
+    }
     let layout = out.layout();
     println!("Output channel layout: {}", layout);
     // start audio output (now the `write_callback` will be called periodically)
