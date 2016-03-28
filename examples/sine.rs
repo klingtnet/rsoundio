@@ -28,16 +28,17 @@ fn main() {
     println!("Output format: {}", out.format().unwrap());
 
     thread::spawn(move || {
-        const LEN: usize = 512;
+        const LEN: usize = 1024;
         let mut pos = 0;
         loop {
-            let f = 440f32;
-            let w = 2.0 * f * PI32 / 48_000.0;
-            let cycle =  (48_000f32 / f) as usize;
+            const f: f32 = 440.0;
+            const w: f32 = 2.0 * f * PI32 / 48_000.0;
+            const a: f32 = 0.6;
+            const cycle: usize = (48_000f32 / f) as usize;
 
             let samples: Vec<f32> = (0..LEN)
-                                    .map(|i| (w * (i+pos) as f32).sin())
-                                    .collect();
+                                        .map(|i| (w * (i + pos) as f32).sin() * a)
+                                        .collect();
             producer.write_blocking(&samples).unwrap();
             pos = (pos + LEN) % cycle;
         }
