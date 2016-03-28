@@ -47,10 +47,7 @@ fn main() {
                                  min_frame_count: u32,
                                  max_frame_count: u32| {
         let mut data = vec![0.0f32; 2048];
-        match consumer.read(&mut data) {
-            Ok(_) => (),
-            Err(err) => println!("{}", err),
-        }
+        consumer.read_blocking(&mut data);
         let frames = vec![data.clone(), data.clone()];
         out.write_stream_f32(min_frame_count, &frames).unwrap();
     });
