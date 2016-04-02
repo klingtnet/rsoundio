@@ -1,6 +1,6 @@
 [package]
 name = "rsoundio"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Andreas Linz <klingt.net@gmail.com>"]
 description = "libsoundio bindings for Rust"
 keywords = ["audio", "stream", "recording"]
