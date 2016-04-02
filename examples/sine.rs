@@ -31,16 +31,16 @@ fn main() {
         const LEN: usize = 1024;
         let mut pos = 0;
         loop {
-            const f: f32 = 440.0;
-            const w: f32 = 2.0 * f * PI32 / 48_000.0;
-            const a: f32 = 0.6;
-            const cycle: usize = (48_000f32 / f) as usize;
+            const F: f32 = 440.0;
+            const W: f32 = 2.0 * F * PI32 / 48_000.0;
+            const A: f32 = 0.6;
+            const CYCLE: usize = (48_000f32 / F) as usize;
 
             let samples: Vec<f32> = (0..LEN)
-                                        .map(|i| (w * (i + pos) as f32).sin() * a)
+                                        .map(|i| (W * (i + pos) as f32).sin() * A)
                                         .collect();
             producer.write_blocking(&samples).unwrap();
-            pos = (pos + LEN) % cycle;
+            pos = (pos + LEN) % CYCLE;
         }
     });
 
