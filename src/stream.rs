@@ -378,6 +378,14 @@ impl<'a> OutStream<'a> {
         unsafe { (*self.stream).sample_rate as u32 }
     }
 
+    /// Sets the stream sample rate.
+    /// Make sure that the device supports the given sample rate to avoid
+    /// sample rate conversions. A `Device` provides `supports_sample_rate` and
+    /// `nearest_sample_rate` methods for this purpose.
+    pub fn set_sample_rate(&mut self, sample_rate: u32) {
+        unsafe { (*self.stream).sample_rate = sample_rate as c_int }
+    }
+
     /// Returns the underlying device of the output stream.
     pub fn device(&self) -> Device {
         let dev = Device::new(unsafe { (*self.stream).device });
