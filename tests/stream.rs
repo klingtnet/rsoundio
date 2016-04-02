@@ -23,7 +23,7 @@ fn test_outstream() {
     assert!(stream.sample_rate() > 0);
     let layout = stream.layout();
     assert_eq!(layout.channel_count(), 2);
-    let cb = |out: rsoundio::OutStream, min_frame_count: u32, max_frame_count: u32| {
+    let cb = move |out: rsoundio::OutStream, min_frame_count: u32, max_frame_count: u32| {
         let l: Vec<f32> = (0..max_frame_count as usize)
                               .map(|i| {
                                   (i as f32 * ((2.0 * ::std::f32::consts::PI * 440.0) / 48_000f32))
