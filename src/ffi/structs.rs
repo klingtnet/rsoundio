@@ -264,8 +264,7 @@ pub struct SoundIoOutStream {
     /// pthread_join, pthread_cond_wait, etc.
     pub write_callback: Option<extern "C" fn(arg1: *mut SoundIoOutStream,
                                                  frame_count_min: c_int,
-                                                 frame_count_max: c_int)
-                                                >,
+                                                 frame_count_max: c_int)>,
     /// This optional callback happens when the sound device runs out of
     /// buffered audio data to play. After this occurs, the outstream waits
     /// until the buffer is full to resume playback.
@@ -343,8 +342,7 @@ pub struct SoundIoInStream {
     /// pthread_join, pthread_cond_wait, etc.
     pub read_callback: Option<unsafe extern "C" fn(arg1: *mut SoundIoInStream,
                                                        frame_count_min: c_int,
-                                                       frame_count_max: c_int)
-                                                      >,
+                                                       frame_count_max: c_int)>,
     /// This optional callback happens when the sound device buffer is full,
     /// yet there is more captured audio to put in it.
     /// This is never fired for PulseAudio.
