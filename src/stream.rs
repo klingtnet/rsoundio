@@ -312,9 +312,10 @@ impl<'a> OutStream<'a> {
     }
 
     fn stream_pause(&self, pause: bool) -> Option<ffi::enums::SioError> {
-        let pause_c_bool = match pause {
-            true => 1u8,
-            false => 0u8,
+        let pause_c_bool = if pause {
+            1u8
+        } else {
+            0u8
         };
 
         match unsafe { ffi::soundio_outstream_pause(self.stream, pause_c_bool) } {
