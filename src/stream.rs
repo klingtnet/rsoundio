@@ -388,8 +388,7 @@ impl<'a> OutStream<'a> {
 
     /// Returns the underlying device of the output stream.
     pub fn device(&self) -> Device {
-        let dev = Device::new(unsafe { (*self.stream).device });
-        dev
+        Device::new(unsafe { (*self.stream).device })
     }
 
     /// Sets the stream name to `name`.
