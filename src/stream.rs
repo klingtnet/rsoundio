@@ -42,7 +42,7 @@ macro_rules! write_stream {
                     unsafe { *addr = buffers[channel][idx] };
                 }
             }
-            self.end_write().map_or(Ok(actual_frame_count), |err| Err(err))
+            self.end_write().map_or(Ok(actual_frame_count), Err)
         }
     )
 }
