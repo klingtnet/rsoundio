@@ -44,7 +44,7 @@ impl SoundIo {
     pub fn connect(&self) -> SioResult<()> {
         match unsafe { ffi::soundio_connect(self.context) } {
             ffi::enums::SioError::None => Ok(()),
-            err @ _ => Err(err),
+            err => Err(err),
         }
     }
 
@@ -61,7 +61,7 @@ impl SoundIo {
     pub fn connect_backend(&self, backend: ffi::enums::SioBackend) -> SioResult<()> {
         match unsafe { ffi::soundio_connect_backend(self.context, backend) } {
             ffi::enums::SioError::None => Ok(()),
-            err @ _ => Err(err),
+            err => Err(err),
         }
     }
 
@@ -76,7 +76,7 @@ impl SoundIo {
     pub fn backend(&self, idx: u32) -> Option<ffi::enums::SioBackend> {
         match unsafe { ffi::soundio_get_backend(self.context, idx as c_int) } {
             ffi::enums::SioBackend::None => None,
-            backend @ _ => Some(backend),
+            backend => Some(backend),
         }
     }
 
@@ -85,7 +85,7 @@ impl SoundIo {
     pub fn current_backend(&self) -> Option<ffi::enums::SioBackend> {
         match unsafe { (*self.context).current_backend } {
             ffi::enums::SioBackend::None => None,
-            backend @ _ => Some(backend),
+            backend => Some(backend),
         }
     }
 
@@ -205,7 +205,7 @@ impl SoundIo {
     pub fn default_input_device_index(&self) -> Option<u32> {
         match unsafe { ffi::soundio_default_input_device_index(self.context) } {
             -1 => None,
-            idx @ _ => Some(idx as u32),
+            idx => Some(idx as u32),
         }
     }
 
@@ -215,7 +215,7 @@ impl SoundIo {
     pub fn default_output_device_index(&self) -> Option<u32> {
         match unsafe { ffi::soundio_default_output_device_index(self.context) } {
             -1 => None,
-            idx @ _ => Some(idx as u32),
+            idx => Some(idx as u32),
         }
     }
 
@@ -297,7 +297,7 @@ impl ChannelLayout {
     pub fn find_channel(&self, channel: ffi::enums::SioChannelId) -> Option<u32> {
         match unsafe { ffi::soundio_channel_layout_find_channel(self.layout, channel) } {
             -1 => None,
-            idx @ _ => Some(idx as u32),
+            idx => Some(idx as u32),
         }
     }
 
@@ -446,7 +446,7 @@ impl Device {
     pub fn probe_error(&self) -> Option<ffi::enums::SioError> {
         match unsafe { (*self.device).probe_error } {
             ffi::enums::SioError::None => None,
-            error @ _ => Some(error),
+            error => Some(error),
         }
     }
 }

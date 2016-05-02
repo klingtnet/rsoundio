@@ -131,7 +131,7 @@ impl<'a> OutStream<'a> {
     pub fn open(&self) -> SioResult<()> {
         match unsafe { ffi::soundio_outstream_open(self.stream) } {
             ffi::enums::SioError::None => Ok(()),
-            err @ _ => Err(err),
+            err => Err(err),
         }
     }
 
@@ -148,7 +148,7 @@ impl<'a> OutStream<'a> {
     pub fn start(&self) -> SioResult<()> {
         match unsafe { ffi::soundio_outstream_start(self.stream) } {
             ffi::enums::SioError::None => Ok(()),
-            err @ _ => Err(err),
+            err => Err(err),
         }
     }
 
@@ -240,14 +240,14 @@ impl<'a> OutStream<'a> {
                                                &mut actual_frame_count as *mut c_int)
         } {
             ffi::enums::SioError::None => Ok(actual_frame_count as u32),
-            err @ _ => Err(err),
+            err => Err(err),
         }
     }
 
     fn end_write(&self) -> Option<ffi::enums::SioError> {
         match unsafe { ffi::soundio_outstream_end_write(self.stream) } {
             ffi::enums::SioError::None => None,
-            err @ _ => Some(err),
+            err => Some(err),
         }
     }
 
@@ -267,7 +267,7 @@ impl<'a> OutStream<'a> {
     pub fn clear_buffer(&self) -> Option<ffi::enums::SioError> {
         match unsafe { ffi::soundio_outstream_clear_buffer(self.stream) } {
             ffi::enums::SioError::None => None,
-            err @ _ => Some(err),
+            err => Some(err),
         }
     }
 
@@ -319,7 +319,7 @@ impl<'a> OutStream<'a> {
 
         match unsafe { ffi::soundio_outstream_pause(self.stream, pause_c_bool) } {
             ffi::enums::SioError::None => None,
-            err @ _ => Some(err),
+            err => Some(err),
         }
     }
 
@@ -339,7 +339,7 @@ impl<'a> OutStream<'a> {
             ffi::soundio_outstream_get_latency(self.stream, &mut latency as *mut c_double)
         } {
             ffi::enums::SioError::None => Ok(latency),
-            err @ _ => Err(err),
+            err => Err(err),
         }
 
     }
@@ -349,7 +349,7 @@ impl<'a> OutStream<'a> {
     pub fn format(&self) -> SioResult<ffi::enums::SioFormat> {
         match unsafe { (*self.stream).format } {
             ffi::enums::SioFormat::Invalid => Err(ffi::enums::SioError::Invalid),
-            fmt @ _ => Ok(fmt),
+            fmt => Ok(fmt),
         }
     }
 
@@ -424,7 +424,7 @@ impl<'a> OutStream<'a> {
     pub fn layout_error(&self) -> SioResult<()> {
         match unsafe { (*self.stream).layout_error } {
             0 => Ok(()),
-            e @ _ => {
+            e => {
                 println!("layout error: {}", e);
                 Ok(())
             }
