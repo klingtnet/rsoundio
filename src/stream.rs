@@ -345,6 +345,34 @@ impl<'a> OutStream<'a> {
 
     }
 
+    /// Ignoring hardware latency, this is the *number of seconds* it takes for the last sample in a
+    /// full buffer to be played.
+    ///
+    /// After you call soundio_outstream_open, this value is replaced with the actual software
+    /// latency, as near to this value as possible. On systems that support clearing the buffer,
+    /// this defaults to a large latency, potentially upwards of 2 seconds, with the understanding
+    /// that you will call soundio_outstream_clear_buffer when you want to reduce the latency to 0.
+    /// On systems that do not support clearing the buffer, this defaults to a reasonable lower
+    /// latency value.
+    ///
+    /// On backends with high latencies (such as 2 seconds), frame_count_min will be 0, meaning you
+    /// don't have to fill the entire buffer. In this case, the large buffer is there if you want
+    /// it; you only have to fill as much as you want. On backends like JACK, frame_count_min will
+    /// be equal to frame_count_max and if you don't fill that many frames, you will get glitches.
+    ///
+    /// If the device has unknown software latency min and max values, you may still set this, but
+    /// you might not get the value you requested. For PulseAudio, if you set this value to
+    /// non-default, it sets `PA_STREAM_ADJUST_LATENCY` and is the value used for maxlength and
+    /// tlength.
+    ///
+    /// For JACK, this value is always equal to `SoundIoDevice::software_latency_current` of the
+    /// device.
+    pub fn set_latency(&self, latency: f64) {
+        unsafe {
+            (*self.stream).software_latency = latency as c_double;
+        }
+    }
+
     /// Returns the current `format` or a `ffi::enums::SioError::Invalid` if
     /// the format is not set.
     pub fn format(&self) -> SioResult<ffi::enums::SioFormat> {
