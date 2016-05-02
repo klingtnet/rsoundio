@@ -19,7 +19,7 @@ macro_rules! write_stream {
         /// than `min_frame_count`, or less buffers
         /// as `channel_count` are provided,
         /// then a `ffi::enums::SioError::Invalid` is returned.
-        pub fn $name(&self, min_frame_count: u32, buffers: &Vec<Vec<$t>>) -> SioResult<u32> {
+        pub fn $name(&self, min_frame_count: u32, buffers: &[Vec<$t>]) -> SioResult<u32> {
             let channel_count = self.layout().channel_count();
             // check if buffer contains frames for all channels
             if buffers.len() < channel_count as usize {
