@@ -10,7 +10,7 @@ fn main() {
     let rb = SpscRb::new(4096);
     let (producer, consumer) = (rb.producer(), rb.consumer());
     // create an audio context
-    let mut sio = rsoundio::SoundIo::new();
+    let mut sio = rsoundio::SoundIo::default();
     sio.set_name("rsoundio-example").unwrap();
     // connect to the default audio backend
     sio.connect().unwrap();

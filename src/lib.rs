@@ -6,7 +6,7 @@
 //! extern crate rsoundio;
 //!
 //! // create new context
-//! let sio = rsoundio::SoundIo::new();
+//! let sio = rsoundio::SoundIo::default();
 //! // connect to default audio backend
 //! sio.connect().unwrap();
 //! sio.flush_events();

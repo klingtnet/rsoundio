@@ -11,7 +11,7 @@ fn test_outstream() {
     if Ci::new().is_some() {
         ::std::process::exit(0)
     }
-    let sio = rsoundio::SoundIo::new();
+    let sio = rsoundio::SoundIo::default();
     sio.connect_backend(rsoundio::SioBackend::Dummy).unwrap();
     let current_backend = sio.current_backend().unwrap();
     assert_eq!(current_backend, rsoundio::SioBackend::Dummy);

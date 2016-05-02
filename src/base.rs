@@ -17,10 +17,10 @@ pub struct SoundIo {
     name: CString,
 }
 impl SoundIo {
-    pub fn new() -> Self {
+    pub fn new<S: Into<String>>(name: S) -> Self {
         SoundIo {
             context: unsafe { ffi::soundio_create() },
-            name: CString::new("rsoundio").unwrap(),
+            name: CString::new(name.into()).unwrap(),
         }
     }
 
@@ -248,6 +248,14 @@ impl SoundIo {
     /// If the name is not a valid UTF-8 string a `SioError::EncodingString` is returned.
     pub fn name(&self) -> SioResult<String> {
         unsafe { ffi::utils::ptr_to_string((*self.context).app_name) }
+    }
+}
+impl Default for SoundIo {
+    fn default() -> Self {
+        SoundIo {
+            context: unsafe { ffi::soundio_create() },
+            name: CString::new("rsoundio").unwrap(),
+        }
     }
 }
 impl Drop for SoundIo {

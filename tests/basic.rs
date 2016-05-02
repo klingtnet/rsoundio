@@ -8,7 +8,7 @@ fn test_soundio() {
     if Ci::new().is_some() {
         return
     }
-    let sio = rsoundio::SoundIo::new();
+    let sio = rsoundio::SoundIo::default();
     assert!(sio.backend_count() > 0);
     assert!(sio.backend(0).is_some());
     sio.connect().unwrap();
@@ -65,7 +65,7 @@ fn test_enums() {
 
 #[test]
 fn test_device() {
-    let sio = rsoundio::SoundIo::new();
+    let sio = rsoundio::SoundIo::default();
     sio.connect().unwrap();
     sio.flush_events();
     let in_dev_idx = sio.default_input_device_index().unwrap();
