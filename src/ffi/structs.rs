@@ -1,5 +1,4 @@
 use std::os::raw::{c_int, c_double, c_void, c_char};
-use std::clone::Clone;
 
 use ffi::enums::*;
 
@@ -7,35 +6,25 @@ use ffi::enums::*;
 /// the number of channels in the layout, the channel id for each
 /// channel and the name of the layout.
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Copy, Clone)]
 pub struct SoundIoChannelLayout {
     pub name: *const c_char,
     pub channel_count: c_int,
     pub channels: [SioChannelId; 24usize],
 }
-impl Clone for SoundIoChannelLayout {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Copy, Clone)]
 pub struct SoundIoSampleRateRange {
     pub min: c_int,
     pub max: c_int,
-}
-impl Clone for SoundIoSampleRateRange {
-    fn clone(&self) -> Self {
-        *self
-    }
 }
 
 /// Stores the base pointer of the sound buffer
 /// and the step size to get to the base address
 /// of the next sample.
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Copy, Clone)]
 pub struct SoundIoChannelArea {
     /// Base address of buffer.
     pub ptr: *mut c_char,
@@ -43,15 +32,10 @@ pub struct SoundIoChannelArea {
     /// the beginning of the next sample.
     pub step: c_int,
 }
-impl Clone for SoundIoChannelArea {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
 
 /// Base struct.
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Copy, Clone)]
 pub struct SoundIo {
     /// Optional. Put whatever you want here. Defaults to NULL.
     pub userdata: *mut c_void,
@@ -111,15 +95,10 @@ pub struct SoundIo {
     /// See SoundIo::jack_info_callback
     pub jack_error_callback: Option<unsafe extern "C" fn(msg: *const c_char)>,
 }
-impl Clone for SoundIo {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
 
 /// Represents a sound device.
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Copy, Clone)]
 pub struct SoundIoDevice {
     /// Read-only. Set automatically.
     pub soundio: *mut SoundIo,
@@ -223,15 +202,10 @@ pub struct SoundIoDevice {
     /// * #SoundIoErrorNoMem
     pub probe_error: SioError,
 }
-impl Clone for SoundIoDevice {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
 
 /// Represents an audio output stream.
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Copy, Clone)]
 pub struct SoundIoOutStream {
     /// Populated automatically when you call ::soundio_outstream_create.
     pub device: *mut SoundIoDevice,
@@ -324,15 +298,10 @@ pub struct SoundIoOutStream {
     /// * #SoundIoErrorIncompatibleDevice
     pub layout_error: c_int,
 }
-impl Clone for SoundIoOutStream {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
 
 /// Represents an audio input stream.
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Copy, Clone)]
 pub struct SoundIoInStream {
     /// Populated automatically when you call ::soundio_outstream_create.
     pub device: *mut SoundIoDevice,
@@ -406,9 +375,4 @@ pub struct SoundIoInStream {
     /// If setting the channel layout fails for some reason, this field is set
     /// to an error code. Possible error codes are: #SoundIoErrorIncompatibleDevice
     pub layout_error: SioError,
-}
-impl Clone for SoundIoInStream {
-    fn clone(&self) -> Self {
-        *self
-    }
 }
