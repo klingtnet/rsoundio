@@ -70,8 +70,8 @@ fn main() {
 
     // open output stream
     out.open().unwrap();
-    let sr = out.sample_rate();
-    println!("Sample rate: {}", sr);
+    let sample_rate = out.sample_rate();
+    println!("Sample rate: {}", sample_rate);
 
     match out.latency() {
         Ok(latency) => println!("SW latency: {}", latency),
