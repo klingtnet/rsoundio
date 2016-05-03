@@ -75,7 +75,7 @@ fn main() {
 
     out.set_latency(sample_rate as f64/BUF_SIZE as f64);
     match out.latency() {
-        Ok(latency) => println!("SW latency: {}", latency),
+        Ok(latency) => println!("SW latency: {:4.2}ms", latency * 1000.0),
         Err(err) => println!("err: {}", err),
     }
     let layout = out.layout();
