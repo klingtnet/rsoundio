@@ -30,7 +30,7 @@ fn main() {
     println!("Output format: {}", out.format().unwrap());
 
     thread::spawn(move || {
-        const LEN: usize = BUF_SIZE/16;
+        const LEN: usize = BUF_SIZE / 16;
         let mut pos = 0;
         loop {
             const F: f32 = 440.0;
@@ -74,7 +74,7 @@ fn main() {
     let sample_rate = out.sample_rate();
     println!("Sample rate: {}", sample_rate);
 
-    out.set_latency(sample_rate as f64/BUF_SIZE as f64);
+    out.set_latency(sample_rate as f64 / BUF_SIZE as f64);
     match out.latency() {
         Ok(latency) => println!("SW latency: {:4.2}ms", latency * 1000.0),
         Err(err) => println!("err: {}", err),
