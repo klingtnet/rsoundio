@@ -73,6 +73,7 @@ fn main() {
     let sample_rate = out.sample_rate();
     println!("Sample rate: {}", sample_rate);
 
+    out.set_latency(sample_rate as f64/BUF_SIZE as f64);
     match out.latency() {
         Ok(latency) => println!("SW latency: {}", latency),
         Err(err) => println!("err: {}", err),
