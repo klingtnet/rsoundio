@@ -50,16 +50,17 @@ fn main() {
     out.register_write_callback(|out: rsoundio::OutStream,
                                  min_frame_count: u32,
                                  max_frame_count: u32| {
-        let mut data = vec![0.0f32; BUF_SIZE];
-        let len = if backend != rsoundio::SioBackend::PulseAudio {
-            ::std::cmp::min(BUF_SIZE, max_frame_count as usize)
-        } else {
-            BUF_SIZE
-        };
-        consumer.read_blocking(&mut data[..len]);
-        let frames = vec![data[..len].iter().cloned().collect(),
-                          data[..len].iter().cloned().collect()];
-        out.write_stream_f32(min_frame_count, &frames).unwrap();
+        let mut frames_left = max_frame_count as usize;
+        let mut buf = vec![0.0f32; BUF_SIZE];
+        while frames_left > 0 {
+            let len = ::std::cmp::min(BUF_SIZE, frames_left);
+            consumer.read_blocking(&mut buf[..len]);
+            let left = buf[..len].iter().cloned().collect::<Vec<f32>>();
+            let right = left.clone();
+            let frames = vec![left, right];
+            let cnt = out.write_stream_f32(min_frame_count, &frames).unwrap() as usize;
+            frames_left -= cnt;
+        }
     });
     out.register_underflow_callback(|out: rsoundio::OutStream| {
         println!("Underflow in {} occured!", out.name().unwrap())
