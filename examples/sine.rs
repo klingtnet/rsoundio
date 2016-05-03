@@ -6,8 +6,10 @@ use std::f32::consts::PI as PI32;
 use std::thread;
 use std::time::Duration;
 
+const BUF_SIZE: usize = 2048;
+
 fn main() {
-    let rb = SpscRb::new(4096);
+    let rb = SpscRb::new(BUF_SIZE);
     let (producer, consumer) = (rb.producer(), rb.consumer());
     // create an audio context
     let mut sio = rsoundio::SoundIo::default();
@@ -28,7 +30,7 @@ fn main() {
     println!("Output format: {}", out.format().unwrap());
 
     thread::spawn(move || {
-        const LEN: usize = 1024;
+        const LEN: usize = BUF_SIZE/16;
         let mut pos = 0;
         loop {
             const F: f32 = 440.0;
@@ -48,7 +50,6 @@ fn main() {
     out.register_write_callback(|out: rsoundio::OutStream,
                                  min_frame_count: u32,
                                  max_frame_count: u32| {
-        const BUF_SIZE: usize = 2048;
         let mut data = vec![0.0f32; BUF_SIZE];
         let len = if backend != rsoundio::SioBackend::PulseAudio {
             ::std::cmp::min(BUF_SIZE, max_frame_count as usize)
