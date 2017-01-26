@@ -49,9 +49,6 @@ fn osx(_: String) {
 fn linux(target: String) {
     if !lib_available("soundio") {
         build(target);
-    } else {
-        // TODO: remove else branch
-        build(target);
     }
 }
 
