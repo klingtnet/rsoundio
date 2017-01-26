@@ -7,9 +7,10 @@ test:
         - >
             eval $(ssh-agent) &&
             ssh-add /home/ubuntu/.ssh/id_circleci_github &&
-            cargo build
+            source ~/.profile && cargo build
     override:
         - >
             eval $(ssh-agent) &&
             ssh-add /home/ubuntu/.ssh/id_circleci_github &&
+            source ~/.profile &&
             LD_LIBRARY_PATH="$(dirname $(find -iname libsoundio.so.1))" cargo test
