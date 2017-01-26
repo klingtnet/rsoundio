@@ -1,7 +1,7 @@
 dependencies:
     post:
         - sudo apt-get install -y alsa-base
-        - curl https://sh.rustup.rs -sSf | sh -s -- --yes --default-toolchain stable
+        - curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
 test:
     pre:
         - >
