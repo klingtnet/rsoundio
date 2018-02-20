@@ -4,6 +4,7 @@
 [![Crates.io](https://img.shields.io/crates/v/rustc-serialize.svg)](https://crates.io/crates/rsoundio)
 [![rustdoc](https://img.shields.io/badge/rustdoc-hosted-blue.svg)](https://docs.klingt.net/rustdoc/rsoundio)
 ![license](https://img.shields.io/badge/license-MIT%2FApache%202.0-blue.svg)
+[![dependency status](https://deps.rs/repo/github/klingtnet/rsoundio/status.svg)](https://deps.rs/repo/github/klingtnet/rsoundio)
 
 Rsoundio is a wrapper for [libsoundio](https://github.com/andrewrk/libsoundio), a cross-platform realtime audio in- and output library.
 
