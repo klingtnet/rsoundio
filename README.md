@@ -1,5 +1,11 @@
 # A Rusty Wrapper for [libsoundio](http://libsound.io)
 
+**Please consider this library abandonware.**
+
+I will keep reviewing merge requests but I won't fix any bugs or add features myself, this is due to lack of time and also because I lost my interest in Rust.
+
+---
+
 [![Circle CI](https://circleci.com/gh/klingtnet/rsoundio.svg?style=svg)](https://circleci.com/gh/klingtnet/rsoundio)
 [![Crates.io](https://img.shields.io/crates/v/rustc-serialize.svg)](https://crates.io/crates/rsoundio)
 [![rustdoc](https://img.shields.io/badge/rustdoc-hosted-blue.svg)](https://docs.klingt.net/rustdoc/rsoundio)
